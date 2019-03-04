@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block sidebar %}
+{% endblock %}
+{% block navbar %}
+    <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                 <div class="row">
+                       {% if alert %}
+                     <div class="alert alert-warning">
+        <span><b> {{ alert }}</b></span>
+    </div>
+                     {% endif %}
+                 </div>
+            </div>
+        </nav>
+{% endblock %}
+{% block content %}
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+ <div class="col-lg-8 col-md-7">
+                        <div class="card">
+                            <div class="header">
+                                <h4 class="title">Регистрация</h4>
+                            </div>
+                            <div class="content">
+                                <form action="{% url 'account:signup' %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Фамилия *</label>
+                                                <input type="text" name="last_name" required class="form-control border-input" placeholder="Фамилия">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Имя *</label>
+                                                <input type="text" name="first_name" required class="form-control border-input" placeholder="Имя">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Отчество</label>
+                                                <input type="text" name="middle_name" class="form-control border-input" placeholder="Отчество">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>ID спонсора *</label>
+                                                <input type="number" name="parent_id" required class="form-control border-input" placeholder="ID" >
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Пакет </label>
+                                                        {% if packages %}
+                                                             <select name="package_id" class="form-control border-input">
+                                                          {% for package in packages %}
+                                                              <option value="{{ package.id }}">{{ package.name }} - {{ package.point }}</option>
+                                                         {% endfor %}
+                                                             </select>
+                                                       {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">Email *</label>
+                                                <input type="email" name="email" required required class="form-control border-input" placeholder="Email">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Сотовый телефон *</label>
+                                                <input type="text" name="phone" required class="form-control border-input" placeholder="Телефон">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label>Адрес *</label>
+                                                <input type="text" name="address" required required class="form-control border-input" placeholder="Адрес">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Город</label>
+                                                <input type="text" name="city" required class="form-control border-input" placeholder="Город">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Страна</label>
+                                                <input type="text" name="country" class="form-control border-input" placeholder="Страна">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-info btn-fill btn-wd">Зарегистрировать</button>
+                                    </div>
+                                    </div>
+                                    <br/>
+                                    <div class="row">
+                                    <div class="text-center">
+                                           <a href="{% url 'account:user_login' %}">Вход</a>
+                                      </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}

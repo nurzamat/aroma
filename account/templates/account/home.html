@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block sidebar %}
+	<div class="sidebar" data-background-color="white" data-active-color="danger">
+    <!--
+		Tip 1: you can change the color of the sidebar's background using: data-background-color="white | black"
+		Tip 2: you can change the color of the active button using the data-active-color="primary | info | success | warning | danger"
+	-->
+    	<div class="sidebar-wrapper">
+            <div class="logo">
+                <a href="" class="simple-text">
+                    Aroma Lifestyle
+                </a>
+            </div>
+            <ul class="nav">
+                <li class="active">
+                    <a href="{% url 'account:home' %}">
+                        <i class="ti-home"></i>
+                        <p>Общая сводка</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'graph:mpttgraph-inline' 'account.models.Node'  node.id %}">
+                        <i class="ti-view-list-alt"></i>
+                        <p>Структура</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'account:invited' %}">
+                        <i class="ti-user"></i>
+                        <p>Приглашенные</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'account:documentation' %}">
+                        <i class="ti-map"></i>
+                        <p>Документация</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'account:notifications' %}">
+                        <i class="ti-bell"></i>
+                        <p>Уведомления</p>
+                    </a>
+                </li>
+            </ul>
+    	</div>
+    </div>
+{% endblock %}
+
+{% block content %}
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="card">
+                            <div class="content">
+                                <div class="row">
+                                    <div class="col-xs-5">
+                                        <div class="icon-big icon-warning text-center">
+                                            <i class="ti-server"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-7">
+                                        <div class="numbers">
+                                            <p>Capacity</p>
+                                            105GB
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="footer">
+                                    <hr />
+                                    <div class="stats">
+                                        <i class="ti-reload"></i> Updated now
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="card">
+                            <div class="content">
+                                <div class="row">
+                                    <div class="col-xs-5">
+                                        <div class="icon-big icon-success text-center">
+                                            <i class="ti-wallet"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-7">
+                                        <div class="numbers">
+                                            <p>Revenue</p>
+                                            $1,345
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="footer">
+                                    <hr />
+                                    <div class="stats">
+                                        <i class="ti-calendar"></i> Last day
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="card">
+                            <div class="content">
+                                <div class="row">
+                                    <div class="col-xs-5">
+                                        <div class="icon-big icon-danger text-center">
+                                            <i class="ti-pulse"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-7">
+                                        <div class="numbers">
+                                            <p>Errors</p>
+                                            23
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="footer">
+                                    <hr />
+                                    <div class="stats">
+                                        <i class="ti-timer"></i> In the last hour
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        <div class="row">
+                    <div class="col-lg-8 col-md-7">
+                        <div class="card">
+                            <div class="header">
+                                <h4 class="title">Профиль</h4>
+                            </div>
+                            <div class="content">
+                                <form>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>ID</label>
+                                                <input type="number"  name="parent_id"  class="form-control border-input" value="{{ user.pk }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Пакет</label>
+                                                <input type="text" name="package_id"  class="form-control border-input" value="{{ profile.package.name}}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Фамилия</label>
+                                                <input type="text"  name="last_name"  class="form-control border-input" value="{{ user.last_name }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Имя</label>
+                                                <input type="text" name="first_name"  class="form-control border-input" value="{{ user.first_name }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Отчество</label>
+                                                <input type="text" name="middle_name"  class="form-control border-input" value="{{ profile.middle_name }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">Email</label>
+                                                <input type="email" name="email"   class="form-control border-input" value="{{ user.email }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Сотовый телефон</label>
+                                                <input type="text" name="phone"  class="form-control border-input" value="{{ profile.phone }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label>Адрес</label>
+                                                <input type="text" name="address"   class="form-control border-input" value="{{ profile.address }}">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Город</label>
+                                                <input type="text"  name="city"  class="form-control border-input" value="{{ profile.city }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Страна</label>
+                                                <input type="text" name="country"  class="form-control border-input" value="{{ profile.country }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+{% endblock %}
