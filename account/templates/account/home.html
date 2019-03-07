@@ -129,6 +129,12 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Ваша реферальная ссылка</label>
+                        <input type="text"  name="referal"  class="form-control border-input" value="http://104.238.171.115/account/signup?sponsor={{user.pk }}">
+                    </div>
+                </div>
         <div class="row">
                     <div class="col-lg-8 col-md-7">
                         <div class="card">
@@ -141,7 +147,7 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>ID</label>
-                                                <input type="number"  name="parent_id"  class="form-control border-input" value="{{ user.pk }}">
+                                                <input type="number"  name="parent_id"  class="form-control border-input" value="{{ node.pk }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">

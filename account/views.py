@@ -26,7 +26,8 @@ def user_login(request):
         return render(request, 'account/login.html')
 
 
-def signup(request):
+def signup(request, sponsor=""):
+    packages = Package.objects.all()
     if request.method == "POST":
         email = request.POST.get('email')
         phone = request.POST.get('phone')
@@ -40,15 +41,28 @@ def signup(request):
         country = request.POST.get('country')
         address = request.POST.get('address')
 
+        parent_node = get_object_or_404(Node, pk=int(parent_id))
+        print(parent_node.get_descendant_count())
+        if parent_node.get_descendant_count() > 1:
+            return render(request, 'account/signup.html', {'alert': "Данный parent занят", 'packages': packages})
+
         user = User(username=email, email=email, first_name=first_name, last_name=last_name, is_staff=1)
         user.set_password(password)
         user.save()
-        package = get_object_or_404(Package, pk=package_id)
+
+        package = packages.get(pk=package_id)
         user_profile = UserProfile.objects.create(user=user, first_name=first_name, last_name=last_name,
                                                   middle_name=middle_name, phone=phone, email=email, city=city,
                                                   country=country, address=address, package=package)
-        parent_node = get_object_or_404(Node, user__pk=int(parent_id))
-        node = Node.objects.create(user=user, name=user.pk + " "+user.first_name + " " + user.username, parent=parent_node)
+
+        user_parent = None
+        if sponsor:
+            user_parent = get_object_or_404(User, pk=int(sponsor))
+        else:
+            return render(request, 'account/signup.html', {'alert': "Зарегистрируйтесь по реферальной ссылке", 'packages': packages})
+
+        node = Node.objects.create(user=user, name=user.first_name + " " + user.last_name, parent=parent_node,
+                                   user_parent=user_parent)
 
         if user and user_profile and node:
             login(request, user)
@@ -61,10 +75,8 @@ def signup(request):
             )
             return redirect('account:home')
         else:
-            packages = Package.objects.all()
             return render(request, 'account/signup.html', {'alert': "Ошибка регистрации", 'packages': packages})
     else:
-        packages = Package.objects.all()
         return render(request, 'account/signup.html', {'packages': packages})
 
 
