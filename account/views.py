@@ -26,12 +26,13 @@ def user_login(request):
         return render(request, 'account/login.html')
 
 
-def signup(request, sponsor=""):
+def signup(request):
     packages = Package.objects.all()
     if request.method == "POST":
+        parent = request.POST.get('parent')
         email = request.POST.get('email')
         phone = request.POST.get('phone')
-        parent_id = request.POST.get('parent_id')
+        tree_parent = request.POST.get('parent_id')
         package_id = request.POST.get('package_id')
         password = 'kymdan2019'
         first_name = request.POST.get('first_name')
@@ -41,10 +42,22 @@ def signup(request, sponsor=""):
         country = request.POST.get('country')
         address = request.POST.get('address')
 
-        parent_node = get_object_or_404(Node, pk=int(parent_id))
+        if parent == '':
+            return render(request, 'account/signup.html', {'alert': "Регистрируйтесь по реферальной ссылке",
+                                                           'packages': packages, 'parent': parent})
+        user_parent = get_object_or_404(User, pk=int(parent))
+        parent_node = get_object_or_404(Node, pk=int(tree_parent))
+        """
+        try:
+            question = Question.objects.get(pk=question_id)
+        except Question.DoesNotExist:
+            raise Http404("Question does not exist")
+        return render(request, 'polls/detail.html', {'question': question})
+        """
         print(parent_node.get_descendant_count())
         if parent_node.get_descendant_count() > 1:
-            return render(request, 'account/signup.html', {'alert': "Данный parent занят", 'packages': packages})
+            return render(request, 'account/signup.html', {'alert': "Данный tree parent занят", 'packages': packages,
+                                                           'parent': parent})
 
         user = User(username=email, email=email, first_name=first_name, last_name=last_name, is_staff=1)
         user.set_password(password)
@@ -55,17 +68,12 @@ def signup(request, sponsor=""):
                                                   middle_name=middle_name, phone=phone, email=email, city=city,
                                                   country=country, address=address, package=package)
 
-        user_parent = None
-        if sponsor:
-            user_parent = get_object_or_404(User, pk=int(sponsor))
-        else:
-            return render(request, 'account/signup.html', {'alert': "Зарегистрируйтесь по реферальной ссылке", 'packages': packages})
-
         node = Node.objects.create(user=user, name=user.first_name + " " + user.last_name, parent=parent_node,
                                    user_parent=user_parent)
 
         if user and user_profile and node:
             login(request, user)
+            """
             send_mail(
                 'Subject here',
                 'Here is the message.',
@@ -73,11 +81,16 @@ def signup(request, sponsor=""):
                 ['nnr86@mail.ru'],
                 fail_silently=False,
             )
+            """
             return redirect('account:home')
         else:
-            return render(request, 'account/signup.html', {'alert': "Ошибка регистрации", 'packages': packages})
+            return render(request, 'account/signup.html', {'alert': "Ошибка регистрации", 'packages': packages,
+                                                           'parent': parent})
     else:
-        return render(request, 'account/signup.html', {'packages': packages})
+        parent = ''
+        if request.GET.get('parent'):
+            parent = request.GET.get('parent')
+        return render(request, 'account/signup.html', {'packages': packages, 'parent': parent})
 
 
 @login_required
