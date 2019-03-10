@@ -13,6 +13,7 @@ urlpatterns = [
     path('structure', views.structure, name='structure'),
     path('invited', views.invited, name='invited'),
     path('invited_ajax', views.invited_ajax, name='invited_ajax'),
+    path('validate_username_ajax', views.validate_username_ajax, name='validate_username_ajax'),
     path('documentation', views.documentation, name='documentation'),
     path('notifications', views.notifications, name='notifications'),
 ]

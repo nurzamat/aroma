@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
+from django.db import IntegrityError, transaction
 
 
 def index(request):
@@ -59,17 +60,18 @@ def signup(request):
             return render(request, 'account/signup.html', {'alert': "Данный tree parent занят", 'packages': packages,
                                                            'parent': parent})
 
-        user = User(username=email, email=email, first_name=first_name, last_name=last_name, is_staff=1)
-        user.set_password(password)
-        user.save()
-
-        package = packages.get(pk=package_id)
-        user_profile = UserProfile.objects.create(user=user, first_name=first_name, last_name=last_name,
-                                                  middle_name=middle_name, phone=phone, email=email, city=city,
-                                                  country=country, address=address, package=package)
-
-        node = Node.objects.create(user=user, name=user.first_name + " " + user.last_name, parent=parent_node,
-                                   user_parent=user_parent)
+        username_exists = User.objects.filter(username__iexact=email).exists()
+        if username_exists:
+            return render(request, 'account/signup.html', {'alert': "Такой логин или email существует в системе",
+                                                           'packages': packages, 'parent': parent})
+        try:
+            with transaction.atomic():
+                node, user, user_profile = save_registration(address, city, country, email, first_name, last_name,
+                                                             middle_name, package_id, packages, parent_node, password,
+                                                             phone, user_parent)
+        except IntegrityError:
+            return render(request, 'account/signup.html', {'alert': "Ошибка при регистрации", 'packages': packages,
+                                                           'parent': parent})
 
         if user and user_profile and node:
             login(request, user)
@@ -91,6 +93,30 @@ def signup(request):
         if request.GET.get('parent'):
             parent = request.GET.get('parent')
         return render(request, 'account/signup.html', {'packages': packages, 'parent': parent})
+
+
+def save_registration(address, city, country, email, first_name, last_name, middle_name, package_id, packages,
+                      parent_node, password, phone, user_parent):
+    user = User(username=email, email=email, first_name=first_name, last_name=last_name, is_staff=1)
+    user.set_password(password)
+    user.save()
+    package = packages.get(pk=package_id)
+    user_profile = UserProfile.objects.create(user=user, first_name=first_name, last_name=last_name,
+                                              middle_name=middle_name, phone=phone, email=email, city=city,
+                                              country=country, address=address, package=package)
+    node = Node.objects.create(user=user, name=user.first_name + " " + user.last_name, parent=parent_node,
+                               user_parent=user_parent)
+    return node, user, user_profile
+
+
+def validate_username_ajax(request):
+    username = request.GET.get('username', None)
+    data = {
+        'is_taken': User.objects.filter(username__iexact=username).exists()
+    }
+    if data['is_taken']:
+        data['error_message'] = 'Такой логин или email существует в системе'
+    return JsonResponse(data)
 
 
 @login_required

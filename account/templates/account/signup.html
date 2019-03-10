@@ -16,6 +16,29 @@
             </div>
         </nav>
 {% endblock %}
+{% block javascript %}
+  <script>
+      $(document).ready(function(){
+         $("#email").change(function () {
+          var username = $(this).val();
+
+      $.ajax({
+        url: '{% url "account:validate_username_ajax" %}',
+        data: {
+          'username': username
+        },
+        dataType: 'json',
+        success: function (data) {
+          if (data.is_taken) {
+            alert(data.error_message);
+          }
+        }
+      });
+
+    });
+    	});
+  </script>
+{% endblock %}
 {% block content %}
         <div class="content">
             <div class="container-fluid">
@@ -73,13 +96,13 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="exampleInputEmail1">Email *</label>
-                                                <input type="email" name="email" required required class="form-control border-input" placeholder="Email">
+                                                <input type="email" id="email" name="email" required class="form-control border-input" placeholder="Email">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Сотовый телефон *</label>
-                                                <input type="text" name="phone" required class="form-control border-input" placeholder="Телефон">
+                                                <input type="text" name="phone" pattern="^[0-9]{9,15}$"  required class="form-control border-input" placeholder="Телефон">
                                             </div>
                                         </div>
                                     </div>
@@ -87,7 +110,7 @@
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <label>Адрес *</label>
-                                                <input type="text" name="address" required required class="form-control border-input" placeholder="Адрес">
+                                                <input type="text" name="address" required  class="form-control border-input" placeholder="Адрес">
                                             </div>
                                         </div>
                                     </div>
@@ -96,7 +119,7 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Город</label>
-                                                <input type="text" name="city" required class="form-control border-input" placeholder="Город">
+                                                <input type="text" name="city" class="form-control border-input" placeholder="Город">
                                             </div>
                                         </div>
                                         <div class="col-md-6">

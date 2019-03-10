@@ -57,7 +57,7 @@
 
             $.ajax({
                 type: 'GET',
-                url: '/account/invited_ajax',
+                url: '{% url "account:invited_ajax" %}',
                 data: {
           'level': level
         },
