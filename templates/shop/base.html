@@ -29,7 +29,7 @@
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css'>
     <link href="{% static 'account/css/themify-icons.css' %}" rel="stylesheet">
-
+<link href="{% static 'account/css/style.css' %}" rel="stylesheet"/>
 </head>
 {% endblock %}
 
@@ -38,10 +38,7 @@
 <div class="wrapper">
 {% block sidebar %}
 	<div class="sidebar" data-background-color="white" data-active-color="danger">
-    <!--
-		Tip 1: you can change the color of the sidebar's background using: data-background-color="white | black"
-		Tip 2: you can change the color of the active button using the data-active-color="primary | info | success | warning | danger"
-	-->
+
     	<div class="sidebar-wrapper">
             <div class="logo">
                 <a href="" class="simple-text">
@@ -49,7 +46,7 @@
                 </a>
             </div>
             <ul class="nav">
-                <li class="active">
+                <li >
                     <a href="home.html">
                         <i class="ti-home"></i>
                         <p>Общая сводка</p>
@@ -65,6 +62,12 @@
                     <a href="invited.html">
                         <i class="ti-user"></i>
                         <p>Приглашенные</p>
+                    </a>
+                </li>
+                 <li class="active">
+                    <a href="#">
+                        <i class="ti-home"></i>
+                        <p>Интернет магазин</p>
                     </a>
                 </li>
                 <li>
@@ -120,15 +123,39 @@
             </div>
         </nav>
 {% endblock %}
-{% block content %}
+{#{% block content %}#}
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
 
+                        <div class="top container-fluid">
+                          Интернет магазин
+                        </div>
+                        <div class="top-bl">
+                          <div class="container-fluid">
+                            <div class="cart ">
+                        {% with total_items=cart|length %}
+                            {% if cart|length > 0 %}
+                                Ваша корзина:
+                                <a href="{% url 'CartDetail' %}" class="text-info">
+                                    {{ total_items }} тов. {{ cart.get_total_price }} y.e.
+                                </a>
+                             {% else %}
+                                  Корзина пустая
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                          </div>
+                        </div>
+
+                      <section id="content row" class="container-fluid">
+                        {% block content %}{% endblock %}
+                      </section>
+
                 </div>
             </div>
         </div>
-{% endblock %}
+{#{% endblock %}#}
 
         <footer class="footer">
             <div class="container-fluid">
