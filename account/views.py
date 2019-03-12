@@ -47,7 +47,20 @@ def signup(request):
             return render(request, 'account/signup.html', {'alert': "Регистрируйтесь по реферальной ссылке",
                                                            'packages': packages, 'parent': parent})
         user_parent = get_object_or_404(User, pk=int(parent))
-        parent_node = get_object_or_404(Node, pk=int(tree_parent))
+        if int(tree_parent) > 0:
+            parent_node = get_object_or_404(Node, pk=int(tree_parent))
+            if parent_node.get_descendant_count() > 1:
+                return render(request, 'account/signup.html',
+                              {'alert': "Данный tree parent занят", 'packages': packages, 'parent': parent})
+        else:
+            # auto define node
+            node = get_object_or_404(Node, user=user_parent)
+            left_node, left_count = get_tree_parent_node(node, False, 0)
+            right_node, right_count = get_tree_parent_node(node, True, 0)
+            if left_count > right_count:
+                parent_node = right_node
+            else:
+                parent_node = left_node
         """
         try:
             question = Question.objects.get(pk=question_id)
@@ -55,10 +68,6 @@ def signup(request):
             raise Http404("Question does not exist")
         return render(request, 'polls/detail.html', {'question': question})
         """
-        print(parent_node.get_descendant_count())
-        if parent_node.get_descendant_count() > 1:
-            return render(request, 'account/signup.html', {'alert': "Данный tree parent занят", 'packages': packages,
-                                                           'parent': parent})
 
         username_exists = User.objects.filter(username__iexact=email).exists()
         if username_exists:
@@ -95,6 +104,20 @@ def signup(request):
         return render(request, 'account/signup.html', {'packages': packages, 'parent': parent})
 
 
+def get_tree_parent_node(node, is_right, count):
+    if node.get_children:
+        child = None
+        for x in node.get_children:
+            if x.is_right == is_right:
+                child = x
+        if child is None:
+            return node, count
+        count = count + 1
+        get_tree_parent_node(child, is_right, count)
+    else:
+        return node, count
+
+
 def save_registration(address, city, country, email, first_name, last_name, middle_name, package_id, packages,
                       parent_node, password, phone, user_parent):
     user = User(username=email, email=email, first_name=first_name, last_name=last_name, is_staff=1)
@@ -104,8 +127,11 @@ def save_registration(address, city, country, email, first_name, last_name, midd
     user_profile = UserProfile.objects.create(user=user, first_name=first_name, last_name=last_name,
                                               middle_name=middle_name, phone=phone, email=email, city=city,
                                               country=country, address=address, package=package)
+    is_right = False
+    if parent_node.get_descendant_count() == 1:
+        is_right = True
     node = Node.objects.create(user=user, name=user.first_name + " " + user.last_name, parent=parent_node,
-                               user_parent=user_parent)
+                               user_parent=user_parent, is_right=is_right)
     return node, user, user_profile
 
 
