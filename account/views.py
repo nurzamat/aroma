@@ -84,15 +84,6 @@ def signup(request):
 
         if user and user_profile and node:
             login(request, user)
-            """
-            send_mail(
-                'Subject here',
-                'Here is the message.',
-                'nurzamat@gmail.com',
-                ['nnr86@mail.ru'],
-                fail_silently=False,
-            )
-            """
             return redirect('account:home')
         else:
             return render(request, 'account/signup.html', {'alert': "Ошибка регистрации", 'packages': packages,
@@ -104,18 +95,16 @@ def signup(request):
         return render(request, 'account/signup.html', {'packages': packages, 'parent': parent})
 
 
-def get_tree_parent_node(node, is_right, count):
-    if node.get_children:
-        child = None
-        for x in node.get_children:
-            if x.is_right == is_right:
-                child = x
-        if child is None:
-            return node, count
-        count = count + 1
-        get_tree_parent_node(child, is_right, count)
-    else:
+def get_tree_parent_node(**kwargs):
+    node = kwargs['node']
+    is_right = kwargs['is_right']
+    count = kwargs['count']
+    try:
+        child = Node.objects.get(parent=node, is_right=is_right)
+    except Node.DoesNotExist:
         return node, count
+    count = count + 1
+    return get_tree_parent_node(node=child, is_right=is_right, count=count)
 
 
 def save_registration(address, city, country, email, first_name, last_name, middle_name, package_id, packages,

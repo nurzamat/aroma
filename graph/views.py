@@ -4,6 +4,7 @@ from django.http.response import Http404
 from django.views.generic import TemplateView
 from graph.models import GraphModel
 from graph.utils import get_model_from_path
+from account.models import Node
 
 
 class ModelListGraphsView(TemplateView):
@@ -30,20 +31,25 @@ class ModelGraphView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super(ModelGraphView, self).get_context_data(**kwargs)
-        model = get_model_from_path(self.kwargs['modpath'])
+        # model = get_model_from_path(self.kwargs['modpath'])
         root_node_pk = self.kwargs['pk']
-        root_node = model.objects.get(pk=root_node_pk)
+        root_node = Node.objects.get(pk=root_node_pk)
         nodes = root_node.get_descendants(include_self=True)
 
-        right_child = model.objects.get(parent=root_node, is_right=True)
-        left_child = model.objects.get(parent=root_node, is_right=False)
         left_count = 0
         right_count = 0
 
-        if left_child is not None:
-            left_count = left_child.get_descendant_count() + 1
-        if right_child is not None:
+        try:
+            right_child = Node.objects.get(parent=root_node, is_right=True)
             right_count = right_child.get_descendant_count() + 1
+        except Node.DoesNotExist:
+            right_child = None
+
+        try:
+            left_child = Node.objects.get(parent=root_node, is_right=False)
+            left_count = left_child.get_descendant_count() + 1
+        except Node.DoesNotExist:
+            left_child = None
 
         context['nodes'] = nodes
         context['total_count'] = left_count + right_count
