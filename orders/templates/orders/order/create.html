@@ -3,37 +3,115 @@
 {% block title %}
   Оформление заказа
 {% endblock %}
+{% block navbar %}
+    	<nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar bar1"></span>
+                        <span class="icon-bar bar2"></span>
+                        <span class="icon-bar bar3"></span>
+                    </button>
+                    <a class="navbar-brand" href="#"></a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        {% with total_items=cart|length %}
+                            {% if cart|length > 0 %}
+                                <li>
+                                <a href="{% url 'CartDetail' %}">
+								 <i class="ti-shopping-cart-full"></i>
+								 <p>{{ total_items }} тов. {{ cart.get_total_price }} y.e.</p>
+                               </a>
+                               </li>
+                                {% else %}
+                                <li>
+                                <a href="#">
+								 <i class="ti-shopping-cart"></i>
+								 <p>Корзина пустая</p>
+                               </a>
+                               </li>
+                            {% endif %}
+                        {% endwith %}
+                        <li class="dropdown">
+                              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <i class="ti-user"></i>
+									<p></p>
+									<b class="caret"></b>
+                              </a>
+                              <ul class="dropdown-menu">
+                                <li><a href="{% url 'account:user_logout' %}">Выйти</a></li>
+                              </ul>
+                        </li>
+                    </ul>
 
+                </div>
+            </div>
+        </nav>
+{% endblock %}
+{% block sidebar %}
+	<div class="sidebar" data-background-color="white" data-active-color="danger">
+    <!--
+		Tip 1: you can change the color of the sidebar's background using: data-background-color="white | black"
+		Tip 2: you can change the color of the active button using the data-active-color="primary | info | success | warning | danger"
+	-->
+    	<div class="sidebar-wrapper">
+            <div class="logo">
+                <a href="" class="simple-text">
+                    Aroma Lifestyle
+                </a>
+            </div>
+            <ul class="nav">
+                <li>
+                    <a href="{% url 'account:home' %}">
+                        <i class="ti-home"></i>
+                        <p>Общая сводка</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'graph:mpttgraph-inline' 'account.models.Node'  node.id %}">
+                        <i class="ti-view-list-alt"></i>
+                        <p>Структура</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'account:invited' %}">
+                        <i class="ti-user"></i>
+                        <p>Приглашенные</p>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="{% url 'ProductList' %}">
+                        <i class="ti-home"></i>
+                        <p>Интернет магазин</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'account:documentation' %}">
+                        <i class="ti-map"></i>
+                        <p>Документация</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'account:notifications' %}">
+                        <i class="ti-bell"></i>
+                        <p>Уведомления</p>
+                    </a>
+                </li>
+            </ul>
+    	</div>
+    </div>
+{% endblock %}
 {% block content %}
 
     <div class="content">
             <div class="container-fluid">
                 <div class="row">
-
-                        <div class="top container-fluid">
-                          Интернет магазин
-                        </div>
-                        <div class="top-bl">
-                          <div class="container-fluid">
-                            <div class="cart ">
-                        {% with total_items=cart|length %}
-                            {% if cart|length > 0 %}
-                                Ваша корзина:
-                                <a href="{% url 'CartDetail' %}" class="text-info">
-                                    {{ total_items }} тов. {{ cart.get_total_price }} y.e.
-                                </a>
-                             {% else %}
-                                  Корзина пустая
-                            {% endif %}
-                        {% endwith %}
-                    </div>
-                          </div>
-                        </div>
-
                       <section id="content row" class="container-fluid">
-                          <h1>Оформление заказа</h1>
+                          <h4>Оформление заказа</h4>
   <div class="col-sm-4">
-    <h2>Заполните форму</h2>
+    <h5>Заполните форму</h5>
     <form class="order-form" action="{% url 'OrderCreate' %}" method="post">
       {{ form.as_p }}
       {% csrf_token %}
@@ -42,7 +120,7 @@
   </div>
 
   <div class="order-info col-sm-8">
-    <h2>Ваш заказ</h2>
+    <h5>Ваш заказ</h5>
     <ul>
       {% for item in cart  %}
         <li>
