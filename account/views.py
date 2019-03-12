@@ -31,11 +31,11 @@ def signup(request):
     packages = Package.objects.all()
     if request.method == "POST":
         parent = request.POST.get('parent')
-        email = request.POST.get('email')
-        phone = request.POST.get('phone')
+        email_phone = request.POST.get('email_phone')
         tree_parent = request.POST.get('parent_id')
         package_id = request.POST.get('package_id')
-        password = 'kymdan2019'
+        username = request.POST.get('username')
+        password = request.POST.get('user_password')
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         middle_name = request.POST.get('middle_name')
@@ -43,16 +43,24 @@ def signup(request):
         country = request.POST.get('country')
         address = request.POST.get('address')
 
+        if '@' in email_phone:
+            email = email_phone
+            phone = ''
+        else:
+            email = ''
+            phone = email_phone
+
         if parent == '':
             return render(request, 'account/signup.html', {'alert': "Регистрируйтесь по реферальной ссылке",
                                                            'packages': packages, 'parent': parent})
+
+        username_exists = User.objects.filter(username__iexact=username).exists()
+        if username_exists:
+            return render(request, 'account/signup.html', {'alert': "Такой логин существует в системе",
+                                                           'packages': packages, 'parent': parent})
+
         user_parent = get_object_or_404(User, pk=int(parent))
-        if int(tree_parent) > 0:
-            parent_node = get_object_or_404(Node, pk=int(tree_parent))
-            if parent_node.get_descendant_count() > 1:
-                return render(request, 'account/signup.html',
-                              {'alert': "Данный tree parent занят", 'packages': packages, 'parent': parent})
-        else:
+        if tree_parent == '':
             # auto define node
             node = get_object_or_404(Node, user=user_parent)
             left_node, left_count = get_tree_parent_node(node, False, 0)
@@ -61,21 +69,15 @@ def signup(request):
                 parent_node = right_node
             else:
                 parent_node = left_node
-        """
-        try:
-            question = Question.objects.get(pk=question_id)
-        except Question.DoesNotExist:
-            raise Http404("Question does not exist")
-        return render(request, 'polls/detail.html', {'question': question})
-        """
+        else:
+            parent_node = get_object_or_404(Node, pk=int(tree_parent))
+            if parent_node.get_descendant_count() > 1:
+                return render(request, 'account/signup.html',
+                              {'alert': "Данный tree parent занят", 'packages': packages, 'parent': parent})
 
-        username_exists = User.objects.filter(username__iexact=email).exists()
-        if username_exists:
-            return render(request, 'account/signup.html', {'alert': "Такой логин или email существует в системе",
-                                                           'packages': packages, 'parent': parent})
         try:
             with transaction.atomic():
-                node, user, user_profile = save_registration(address, city, country, email, first_name, last_name,
+                node, user, user_profile = save_registration(address, city, country, username, email, first_name, last_name,
                                                              middle_name, package_id, packages, parent_node, password,
                                                              phone, user_parent)
         except IntegrityError:
@@ -95,21 +97,18 @@ def signup(request):
         return render(request, 'account/signup.html', {'packages': packages, 'parent': parent})
 
 
-def get_tree_parent_node(**kwargs):
-    node = kwargs['node']
-    is_right = kwargs['is_right']
-    count = kwargs['count']
+def get_tree_parent_node(node, is_right, count):
     try:
         child = Node.objects.get(parent=node, is_right=is_right)
     except Node.DoesNotExist:
         return node, count
     count = count + 1
-    return get_tree_parent_node(node=child, is_right=is_right, count=count)
+    return get_tree_parent_node(child, is_right, count)
 
 
-def save_registration(address, city, country, email, first_name, last_name, middle_name, package_id, packages,
+def save_registration(address, city, country, username, email, first_name, last_name, middle_name, package_id, packages,
                       parent_node, password, phone, user_parent):
-    user = User(username=email, email=email, first_name=first_name, last_name=last_name, is_staff=1)
+    user = User(username=username, email=email, first_name=first_name, last_name=last_name, is_staff=1)
     user.set_password(password)
     user.save()
     package = packages.get(pk=package_id)
@@ -130,7 +129,7 @@ def validate_username_ajax(request):
         'is_taken': User.objects.filter(username__iexact=username).exists()
     }
     if data['is_taken']:
-        data['error_message'] = 'Такой логин или email существует в системе'
+        data['error_message'] = 'Такой логин существует в системе'
     return JsonResponse(data)
 
 
