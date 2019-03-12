@@ -14,7 +14,7 @@
                                     <tbody id="table_body">
         {% for node in nodes %}
             <tr>
-                <td>{{ node.user.pk }}</td>
+                <td>{{ node.pk }}</td>
                 <td>{{ node.user.username }}</td>
                 <td>{{ node.user.last_name }} {{ node.user.first_name }}</td>
                 <td>{{ node.total_point }}</td>
