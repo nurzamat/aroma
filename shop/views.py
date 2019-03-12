@@ -18,5 +18,5 @@ def ProductDetail(request, id):
     product = get_object_or_404(Product, id=id, available=True)
     cart_product_form = CartAddProductForm()
     return render(request, 'shop/product/deatail.html',
-                             {'product': product,
+                  {'product': product,
                               'cart_product_form': cart_product_form})

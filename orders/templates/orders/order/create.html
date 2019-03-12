@@ -1,11 +1,37 @@
-{% extends "shop/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}
   Оформление заказа
 {% endblock %}
 
 {% block content %}
-  <h1>Оформление заказа</h1>
+
+    <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+
+                        <div class="top container-fluid">
+                          Интернет магазин
+                        </div>
+                        <div class="top-bl">
+                          <div class="container-fluid">
+                            <div class="cart ">
+                        {% with total_items=cart|length %}
+                            {% if cart|length > 0 %}
+                                Ваша корзина:
+                                <a href="{% url 'CartDetail' %}" class="text-info">
+                                    {{ total_items }} тов. {{ cart.get_total_price }} y.e.
+                                </a>
+                             {% else %}
+                                  Корзина пустая
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                          </div>
+                        </div>
+
+                      <section id="content row" class="container-fluid">
+                          <h1>Оформление заказа</h1>
   <div class="col-sm-4">
     <h2>Заполните форму</h2>
     <form class="order-form" action="{% url 'OrderCreate' %}" method="post">
@@ -25,4 +51,11 @@
       {% endfor %}
     </ul>
   </div>
+                </section>
+
+                </div>
+            </div>
+        </div>
+
+
 {% endblock %}

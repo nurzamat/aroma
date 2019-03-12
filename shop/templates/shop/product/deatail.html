@@ -1,11 +1,9 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block title %}
-  Спасибо за заказ
+  {{ product.name }}
 {% endblock %}
-
 {% block content %}
-
     <div class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -31,13 +29,35 @@
                         </div>
 
                       <section id="content row" class="container-fluid">
-                        <h1 class="text-success">Заказ принят. Спасибо за заказ</h1>
-  <p class="text-danger">Идентификатор вашего заказа: {{ order.id }}</p>
+                       <div class="product-detail" xmlns:cart="http://www.w3.org/1999/xhtml">
+    <div class="col-sm-4">
+      <img src="{% if product.image %}{{ product.image.url }}{% else %}{% endif %}" class="img-responsive">
+    </div>
+    <div class="col-sm-8">
+      <h1>{{ product.name }}</h1>
+
+      <p class="price text-info">
+        {{ product.price }} y.e.
+      </p>
+      <form action="{% url 'CartAdd' product.id %}" method="post">
+        {% csrf_token %}
+    {{ cart_product_form }}
+
+    <input type="submit" class="btn btn-info btn-fill" value="Добавить в корзину">
+</form>
+
+      <span>
+        {{ product.description | linebreaks}}
+      </span>
+    </div>
+  </div>
                       </section>
 
                 </div>
             </div>
         </div>
+
+
 
 
 {% endblock %}

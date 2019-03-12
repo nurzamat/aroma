@@ -65,7 +65,7 @@
                     </a>
                 </li>
                  <li class="active">
-                    <a href="#">
+                    <a href="{% url 'ProductList' %}">
                         <i class="ti-home"></i>
                         <p>Интернет магазин</p>
                     </a>
@@ -123,39 +123,9 @@
             </div>
         </nav>
 {% endblock %}
-{#{% block content %}#}
-        <div class="content">
-            <div class="container-fluid">
-                <div class="row">
+{% block content %}
 
-                        <div class="top container-fluid">
-                          Интернет магазин
-                        </div>
-                        <div class="top-bl">
-                          <div class="container-fluid">
-                            <div class="cart ">
-                        {% with total_items=cart|length %}
-                            {% if cart|length > 0 %}
-                                Ваша корзина:
-                                <a href="{% url 'CartDetail' %}" class="text-info">
-                                    {{ total_items }} тов. {{ cart.get_total_price }} y.e.
-                                </a>
-                             {% else %}
-                                  Корзина пустая
-                            {% endif %}
-                        {% endwith %}
-                    </div>
-                          </div>
-                        </div>
-
-                      <section id="content row" class="container-fluid">
-                        {% block content %}{% endblock %}
-                      </section>
-
-                </div>
-            </div>
-        </div>
-{#{% endblock %}#}
+{% endblock %}
 
         <footer class="footer">
             <div class="container-fluid">
