@@ -71,7 +71,8 @@ def signup(request):
                 parent_node = left_node
         else:
             parent_node = get_object_or_404(Node, pk=int(tree_parent))
-            if parent_node.get_descendant_count() > 1:
+            children = Node.objects.filter(parent=parent_node)
+            if children and children.count() > 1:
                 return render(request, 'account/signup.html',
                               {'alert': "Данный tree parent занят", 'packages': packages, 'parent': parent})
 
