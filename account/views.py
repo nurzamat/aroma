@@ -109,6 +109,8 @@ def get_tree_parent_node(node, is_right, count):
 
 def save_registration(address, city, country, username, email, first_name, last_name, middle_name, package_id, packages,
                       parent_node, password, phone, user_parent):
+    if parent_node.get_descendant_count() > 1:
+        raise ValueError("Children count > 1")
     user = User(username=username, email=email, first_name=first_name, last_name=last_name, is_staff=1)
     user.set_password(password)
     user.save()
