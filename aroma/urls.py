@@ -24,6 +24,7 @@ admin.site.site_header = 'Администрирование'
 admin.site.index_title = ''
 
 urlpatterns = [
+    path('',include('main.urls')),
     path('account/', include('account.urls')),
     path('admin/', admin.site.urls),
     path('graph/', include('graph.urls')),
