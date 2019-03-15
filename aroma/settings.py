@@ -101,9 +101,9 @@ DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "aroma",
-        "USER": "aroma",
-        "PASSWORD": "aroma",
-        "HOST": "104.238.171.115",
+        "USER": "postgres",
+        "PASSWORD": "postgres",
+        "HOST": "localhost",
         "PORT": "5432",
     }
 }
