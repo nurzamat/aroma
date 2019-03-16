@@ -82,7 +82,6 @@ class BonusSettings(models.Model):
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now=True, blank=True)
 
-    def __str__(self):
-        return self.bonus_value
+
 
 
