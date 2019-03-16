@@ -83,6 +83,6 @@ class BonusSettings(models.Model):
     created_date = models.DateTimeField(auto_now=True, blank=True)
 
     def __str__(self):
-        return self.user.username
+        return self.bonus_value
 
 
