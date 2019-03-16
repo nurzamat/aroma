@@ -14,6 +14,10 @@ class Node(MPTTModel):
     total_point = models.IntegerField(default=0)
     left_point = models.IntegerField(default=0)
     right_point = models.IntegerField(default=0)
+    bonus = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    step = models.IntegerField(default=0)
+    cycle = models.IntegerField(default=0)
+    activate_date = models.DateTimeField(auto_now=True, blank=True, null=True)
     user_parent = models.ForeignKey(User, null=True, blank=True, related_name='user_children', on_delete=models.DO_NOTHING)
     parent = TreeForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.CASCADE)
 
@@ -28,17 +32,6 @@ class Package(models.Model):
     name = models.CharField(max_length=50)
     point = models.IntegerField(default=0)
     price_som = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-
-class Bonus(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    price_som = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    created_date = models.DateTimeField(auto_now=True, blank=True)
-    type = models.IntegerField(default=0)
-    status = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -61,5 +54,35 @@ class UserProfile(models.Model):
         return self.user.username
 
 
+class BonusType(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+class Bonus(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bonus_user")
+    value = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    partner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bonus_partner", null=True)
+    type = models.CharField(max_length=60, null=True, blank=True)
+    created_date = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return self.value
+
+
+class Settings(models.Model):
+    bonus_type = models.ForeignKey(BonusType, on_delete=models.CASCADE)
+    bonus_value = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    level = models.IntegerField(default=0)
+    left = models.IntegerField(default=0)
+    right = models.IntegerField(default=0)
+    diff = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_date = models.DateTimeField(auto_now=True, blank=True)
+
+    def __str__(self):
+        return self.user.username
 
 
