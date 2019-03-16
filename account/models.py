@@ -72,7 +72,7 @@ class Bonus(models.Model):
         return self.value
 
 
-class Settings(models.Model):
+class BonusSettings(models.Model):
     bonus_type = models.ForeignKey(BonusType, on_delete=models.CASCADE)
     bonus_value = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     level = models.IntegerField(default=0)
