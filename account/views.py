@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.urls import reverse
-from .models import Node, UserProfile, Package
+from .models import Node, UserProfile, Package, BonusSettings, BonusType, Bonus
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -78,7 +78,8 @@ def signup(request):
 
         try:
             with transaction.atomic():
-                node, user, user_profile = save_registration(address, city, country, username, email, first_name, last_name,
+                node, user, user_profile = save_registration(address, city, country, username, email, first_name,
+                                                             last_name,
                                                              middle_name, package_id, packages, parent_node, password,
                                                              phone, user_parent)
         except IntegrityError:
@@ -109,7 +110,6 @@ def get_tree_parent_node(node, is_right, count):
 
 def save_registration(address, city, country, username, email, first_name, last_name, middle_name, package_id, packages,
                       parent_node, password, phone, user_parent):
-
     desc_count = parent_node.get_descendant_count()
     if desc_count > 1:
         raise ValueError("Children count > 1")
@@ -126,7 +126,69 @@ def save_registration(address, city, country, username, email, first_name, last_
         is_right = True
     node = Node.objects.create(user=user, name=user.first_name + " " + user.last_name, parent=parent_node,
                                user_parent=user_parent, is_right=is_right)
+
+    calculate_bonus(user, user_parent)
+
     return node, user, user_profile
+
+
+def calculate_bonus(user, user_parent):
+    # bonus
+    if user_parent:
+        bonus_settings = BonusSettings.objects.all()
+        bonus_types = BonusType.objects.all()
+        recommendation_type = bonus_types.get(code=1)
+        step_type = bonus_types.get(code=2)
+        cycle_type = bonus_types.get(code=3)
+
+        inviter_node = Node.objects.get(user=user_parent)
+
+        # bonus for recommendation
+        recommendation_bonus_value = bonus_settings.get(bonus_type=recommendation_type, level=1).bonus_value
+        Bonus.objects.create(user=user_parent, value=recommendation_bonus_value, partner=user,
+                             type=recommendation_type.name)
+        inviter_node.bonus = inviter_node.bonus + recommendation_bonus_value
+
+        # bonus for step
+        left_count = 0
+        right_count = 0
+
+        try:
+            right_child = Node.objects.get(parent=inviter_node, is_right=True)
+            right_count = right_child.get_descendant_count() + 1
+        except Node.DoesNotExist:
+            right_child = None
+
+        try:
+            left_child = Node.objects.get(parent=inviter_node, is_right=False)
+            left_count = left_child.get_descendant_count() + 1
+        except Node.DoesNotExist:
+            left_child = None
+
+        if left_child and right_child:
+            try:
+                step_settings = bonus_settings.get(bonus_type=step_type, level=inviter_node.step + 1)
+                summ_boolean = left_count + right_count >= step_settings.left + step_settings.right
+                diff_boolean = abs(left_count - right_count) <= step_settings.diff
+                if summ_boolean and diff_boolean:
+                    Bonus.objects.create(user=user_parent, value=step_settings.bonus_value,
+                                         partner=user, type=step_type.name)
+                    inviter_node.bonus = inviter_node.bonus + step_settings.bonus_value
+                    inviter_node.step = inviter_node.step + 1
+                    # bonus for cycle
+                    last_level_exist = bonus_settings.filter(bonus_type=step_type, level=inviter_node.step + 1).exists()
+                    if not last_level_exist:
+                        try:
+                            cycle_settings = bonus_settings.get(bonus_type=cycle_type, level=inviter_node.cycle + 1)
+                            Bonus.objects.create(user=user_parent, value=cycle_settings.bonus_value,
+                                                 partner=user, type=cycle_type.name)
+                            inviter_node.bonus = inviter_node.bonus + cycle_settings.bonus_value
+                            inviter_node.cycle = inviter_node.cycle + 1
+                        except BonusSettings.DoesNotExist:
+                            pass
+            except BonusSettings.DoesNotExist:
+                pass
+        inviter_node.save()
 
 
 def validate_username_ajax(request):
@@ -172,10 +234,10 @@ def invited(request):
 @login_required
 def invited_ajax(request):
     user = request.user
-    level = request.GET.get('level')
+    level = int(request.GET.get('level'))
     s = 1
     ids = Node.objects.filter(user_parent=user).values_list('user_id', flat=True)
-    while s < int(level):
+    while s < level:
         s = s + 1
         ids = Node.objects.filter(user_parent__pk__in=ids).values_list('user_id', flat=True)
     nodes = Node.objects.filter(user__pk__in=ids)
