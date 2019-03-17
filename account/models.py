@@ -55,6 +55,7 @@ class UserProfile(models.Model):
 
 
 class BonusType(models.Model):
+    code = models.IntegerField(default=0, unique=True)
     name = models.CharField(max_length=50)
 
     def __str__(self):
