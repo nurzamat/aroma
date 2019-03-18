@@ -147,7 +147,11 @@ def calculate_bonus(user, user_parent):
         recommendation_bonus_value = bonus_settings.get(bonus_type=recommendation_type, level=1).bonus_value
         Bonus.objects.create(user=user_parent, value=recommendation_bonus_value, partner=user,
                              type=recommendation_type.name)
-        inviter_node.bonus = inviter_node.bonus + recommendation_bonus_value
+
+        if inviter_node.bonus is None:
+            inviter_node.bonus = recommendation_bonus_value
+        else:
+            inviter_node.bonus = inviter_node.bonus + recommendation_bonus_value
 
         # bonus for step
         left_count = 0

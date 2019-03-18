@@ -5,6 +5,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 from django.contrib.auth.models import User
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+from decimal import Decimal
 
 
 class Node(MPTTModel):
@@ -14,7 +15,7 @@ class Node(MPTTModel):
     total_point = models.IntegerField(default=0)
     left_point = models.IntegerField(default=0)
     right_point = models.IntegerField(default=0)
-    bonus = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    bonus = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'), blank=True, null=True)
     step = models.IntegerField(default=0)
     cycle = models.IntegerField(default=0)
     activate_date = models.DateTimeField(auto_now=True, blank=True, null=True)
