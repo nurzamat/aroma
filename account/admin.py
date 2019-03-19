@@ -7,6 +7,7 @@ admin.site.register(Node)
 admin.site.register(UserProfile)
 admin.site.register(BonusType)
 admin.site.register(BonusSettings)
+# admin.site.register(Bonus)
 
 
 
