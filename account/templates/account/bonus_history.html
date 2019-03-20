@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load staticfiles mptt_tags %}
+{% load static %}
 
 {% block sidebar %}
 	<div class="sidebar" data-background-color="white" data-active-color="danger">
@@ -20,8 +20,8 @@
                         <p>Общая сводка</p>
                     </a>
                 </li>
-                <li class="active">
-                    <a href="">
+                <li>
+                    <a href="{% url 'graph:mpttgraph-inline' 'account.models.Node' node.id %}">
                         <i class="ti-view-list-alt"></i>
                         <p>Структура</p>
                     </a>
@@ -32,7 +32,7 @@
                         <p>Приглашенные</p>
                     </a>
                 </li>
-                <li>
+                <li class="active">
                     <a href="{% url 'account:bonus_history' %}">
                         <i class="ti-server"></i>
                         <p>История бонусов</p>
@@ -62,43 +62,40 @@
 {% endblock %}
 
 {% block content %}
-    <link rel="stylesheet" media="screen, projection" href="{% static 'graph/tree.css' %}" />
         <div class="content">
             <div class="container-fluid">
-                <a href="{% url 'account:structure' %}">Показать списком</a>
-               <div class="text-center">
-               <div class="row">
-                   Левая: {{ left_count }} | Правая: {{ right_count }} | Общее количество: {{ total_count }}
-               </div>
-	<div class="text-left" style="width: 3000px; display:inline-block; overflow-x:scroll">
-		<div class="tree">
-			<ul>
-			{% recursetree nodes %}
-		        <li>
-		        	<a style="border-width: 0px;" href="{% if node.url %}{{ node.url }}{% else %}{{ node.get_absolute_url }}{% endif %}" id="{{ id }}">
-                        <div class="logo-container">
-                        <div class="logo">
-                            <img style="border-radius: 50%;" src="{% static 'account/img/new_logo.png' %}"/>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="header">
+                                <h7 class="title">История бонусов</h7>
+                                <p class="category">Общая сумма: {{ total_sum }}</p>
+                            </div>
+                            <div class="content table-responsive table-full-width">
+                               {% if history|length > 0 %}
+                                <table class="table table-striped">
+                                    <thead>
+                                        <th>Тип</th>
+                                    	<th>Фамилия Имя</th>
+                                    	<th>Сумма</th>
+                                    	<th>Дата</th>
+                                    </thead>
+                                    <tbody id="table_body">
+        {% for bonus in history %}
+            <tr>
+                <td>{{ bonus.type }}</td>
+                <td>{{ bonus.partner.last_name }} {{ bonus.partner.first_name }}</td>
+                <td>{{ bonus.value }}</td>
+                <td>{{ bonus.created_date }}</td>
+            </tr>
+        {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% endif %}
+                            </div>
                         </div>
-                        <div class="brand">
-                            Id={{ node.pk }} {{ node.name }}
-                        </div>
-                        </div>
-		            	<div id="displayzone_{{ id }}" class="displayzone"></div>
-		            </a>
-		            {% if not node.is_leaf_node %}
-		                <ul>
-		                    {{ children }}
-		                </ul>
-		            {% endif %}
-		        </li>
-		    {% endrecursetree %}
-		    </ul>
-	    </div>
-	</div>
+                    </div>
                 </div>
             </div>
         </div>
-{% endblock %}
- {% block footer %}
 {% endblock %}

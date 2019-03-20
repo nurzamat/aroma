@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.db import IntegrityError, transaction
+from django.db.models import Sum
 
 
 def index(request):
@@ -246,6 +247,15 @@ def invited_ajax(request):
         ids = Node.objects.filter(user_parent__pk__in=ids).values_list('user_id', flat=True)
     nodes = Node.objects.filter(user__pk__in=ids)
     return render(request, 'account/invited_ajax.html', {'nodes': nodes})
+
+
+@login_required
+def bonus_history(request):
+    user = request.user
+    node = user.node
+    history = Bonus.objects.filter(user=user).order_by('-created_date')
+    total_sum = Bonus.objects.all().aggregate(Sum('value'))['value__sum'] or 0.00
+    return render(request, 'account/bonus_history.html', {'node': node, 'total_sum': total_sum, 'history': history})
 
 
 @login_required

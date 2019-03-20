@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'cart',
     'orders',
     'main',
-    'bonus',
 ]
 
 REST_FRAMEWORK = {
@@ -105,7 +104,7 @@ DATABASES = {
         "USER": "postgres",
         "PASSWORD": "postgres",
         "HOST": "localhost",
-        "PORT": "5432",
+        "PORT": "5433",
     }
 }
 
