@@ -254,7 +254,7 @@ def bonus_history(request):
     user = request.user
     node = user.node
     history = Bonus.objects.filter(user=user).order_by('-created_date')
-    total_sum = Bonus.objects.all().aggregate(Sum('value'))['value__sum'] or 0.00
+    total_sum = Bonus.objects.filter(user=user).aggregate(Sum('value'))['value__sum'] or 0.00
     return render(request, 'account/bonus_history.html', {'node': node, 'total_sum': total_sum, 'history': history})
 
 
