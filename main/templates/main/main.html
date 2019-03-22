@@ -152,34 +152,29 @@
 					</div>
 				</div>
 			</div>
+<div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <section id="content row" class="container-fluid">
+                       <div id="main" class="col-sm-9">
 
-			<div class="featured-list">
-				<div id="grid" class="clearfix">
+    <div class="items row">
+      {% for product in products %}
+        <div class="item col-md-4">
 
+       <img src="{% if product.image %}{{ product.image.url }}{% endif %}" class="img-responsive " >
 
-                    {% for product in products %}
-
-                        <div class="thumb">
-						<a href="#">
-							<img src="{% if product.image %}{{ product.image.url }}{% endif %}" class="img-responsive " width="200" height="100" alt="" />
-						</a>
-
-						<div class="thumb-rollover">
-							<div class="project-title">
-								<h4>{{ product.name }}</h4>
-								<h5>{{ product.price }} y.e.</h5>
-							</div>
-						</div>
-
-					</div>
-
+            <h4> {{ product.name }}</h4>
+          {{ product.price }} y.e.
+        </div>
       {% endfor %}
+    </div>
+  </div>
+                      </section>
+                </div>
+            </div>
+        </div>
 
-
-
-
-				</div>
-			</div>
 
 
 		</section>
