@@ -111,7 +111,9 @@ def get_tree_parent_node(node, is_right, count):
 
 def save_registration(address, city, country, username, email, first_name, last_name, middle_name, package_id, packages,
                       parent_node, password, phone, user_parent):
-    desc_count = parent_node.get_descendant_count()
+    desc_count = 0
+    if parent_node.children:
+        desc_count = parent_node.children.all().count()
     if desc_count > 1:
         raise ValueError("Children count > 1")
 
