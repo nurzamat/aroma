@@ -1,0 +1,39 @@
+{% extends "mainbase.html" %}
+{% load static %}
+{% block title %}
+  {{ product.name }}
+{% endblock %}
+
+
+{% block content %}
+    <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                      <section id="content row" class="container-fluid">
+                       <div class="product-detail" xmlns:cart="http://www.w3.org/1999/xhtml">
+    <div class="col-sm-4">
+      <img src="{% if product.image %}{{ product.image.url }}{% else %}{% endif %}" class="img-responsive">
+    </div>
+    <div class="col-sm-8">
+      <h4>{{ product.name }}</h4>
+
+      <p class="price text-info">
+        {{ product.price }} y.e.
+      </p>
+
+
+      <span>
+        {{ product.description | linebreaks}}
+      </span>
+    </div>
+  </div>
+                      </section>
+
+                </div>
+            </div>
+        </div>
+
+
+
+
+{% endblock %}
