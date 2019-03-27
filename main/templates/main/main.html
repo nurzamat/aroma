@@ -54,15 +54,15 @@
 
 							<div class="navbar-collapse collapse">
 								<ul class="nav navbar-nav navbar-right">
-									<li><a href="#home">Home</a></li>
-									<li><a href="#about">About</a></li>
-									<li><a href="#features">Services</a></li>
-									<li><a href="#feature-work">Portfolio</a></li>
-									<li><a href="#testimonials">Testimonials</a></li>
-									<li><a href="#blog">Blog</a></li>
-									<li><a href="#pricing">Pricing</a></li>
-									<li><a href="#faq">FAQ</a></li>
-									<li><a href="#contact-us">Contact</a></li>
+									<li><a href="#home">Главная</a></li>
+									<li><a href="#about">О нас</a></li>
+
+									<li><a href="#feature-work">Продукты</a></li>
+									<li><a href="#testimonials">Отзывы</a></li>
+									<li><a href="#blog">Новости</a></li>
+									<li><a href="#pricing">Адреса</a></li>
+
+									<li><a href="{% url 'account:user_login' %}">Личный кабинет</a></li>
 								</ul>
 							</div>
 
@@ -533,13 +533,16 @@
 						<div class="col-sm-5">
 							<div class="footer-menu pull-right">
 								<ul>
-									<li><a href="#">Home</a></li>
-									<li><a href="#">About</a></li>
-									<li><a href="#">Services</a></li>
-									<li><a href="#">Faq</a></li>
-									<li><a href="#">Pricing</a></li>
-									<li><a href="#">Blog</a></li>
-									<li><a href="#">Contact</a></li>
+									<li><a href="#home">Главная</a></li>
+									<li><a href="#about">О нас</a></li>
+
+									<li><a href="#feature-work">Продукты</a></li>
+									<li><a href="#testimonials">Отзывы</a></li>
+									<li><a href="#blog">Новости</a></li>
+									<li><a href="#pricing">Адреса</a></li>
+
+									<li><a href="{% url 'account:user_login' %}">Личный кабинет</a></li>
+
 								</ul>
 							</div>
 						</div>
