@@ -1,4 +1,6 @@
 from django.db import models
+
+
 # Модель продукта
 class Product(models.Model):
     name = models.CharField(max_length=200, db_index=True, verbose_name="Название")
@@ -9,8 +11,6 @@ class Product(models.Model):
     available = models.BooleanField(default=True, verbose_name="Доступен")
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-
-
 
     def __str__(self):
         return self.name
