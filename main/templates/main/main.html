@@ -121,9 +121,10 @@
 					</div>
 					<div class="col-sm-6">
 						<div class="about-text wow fadeInRight">
-							<h3>About Our Company</h3>
-							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-							<a href="#" class="btn btn-read-more">Read More</a>
+							<h3>О компании</h3>
+							<p>Совместный проект LifeStyle при ОсОО «АromaЕсо» это транснациональный проект, специализирующийся на реализации фармакологических препаратов и косметических средств на международном розничном рынке, а так же туристическом бизнесе, финансовых операциях и инвестиционной деятельности.
+Основные направления деятельности проекта — оздоровление, восстановление и поддержание здоровья. Продукция разработана на основе пяти тысячелетнего опыта тибетской медицины, изготовление с использованием современных технологий.
+                                <a href="#" class="btn btn-read-more">Подробнее</a>
 						</div>
 					</div>
 				</div>
@@ -157,8 +158,8 @@
 				</div>
 			</div>
 
-			<div class="content">
-            <div class="container-fluid">
+
+            <div class="container">
                 <div class="row">
                     <section id="content row" class="container-fluid">
                        <div id="main" class="col-sm-12">
@@ -169,14 +170,17 @@
 <a href="{{product.id}}">
        <img src="{% if product.image %}{{ product.image.url }}{% endif %}" class="img-responsive " >
 </a>
-            <a href="{{ product.id}}">{{ product.name }} <h4> {{ product.name }}</h4></a><br>
-          {{ product.price }} y.e.
+            <a href="{{ product.id}}"> <h4> {{ product.name }}</h4></a><br>
+
         </div>
       {% endfor %}
     </div>
   </div>
 
 		</section>
+                </div>
+            </div>
+        </section>
 
 		<!-- Featured Work -->
 
@@ -350,85 +354,40 @@
 
 			<div class="container">
 				<div class="row">
-					<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+					<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-lg-offset-3">
 
 					<!-- PRICE ITEM -->
 
-					<div class="panel price panel-green">
-						<div class="panel-heading arrow_box text-center">
-						<h3>Ош</h3>
-						</div>
-
-						<ul class="list-group list-group-flush text-center">
-							<li class="list-group-item"><i class="icon-ok text-success"></i> Масалиев кочосу</li>
-							<li class="list-group-item"><i class="icon-ok text-success"></i> дом 27/7</li>
-							<li class="list-group-item"><i class="icon-ok text-success"></i>tel:0779499999</li>
-							<li class="list-group-item"><i class="icon-ok text-success"></i>tel:0779499999</li>
-						</ul>
-
-					</div>
-					<!-- /PRICE ITEM -->
-
-
-					</div>
-
-
-				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
-
-					<!-- PRICE ITEM -->
-					<div class="panel price panel-green">
-						<div class="panel-heading arrow_box text-center">
-						<h3>Ош</h3>
-						</div>
-
-						<ul class="list-group list-group-flush text-center">
-							<li class="list-group-item"><i class="icon-ok text-success"></i> Масалиев кочосу</li>
-							<li class="list-group-item"><i class="icon-ok text-success"></i> дом 27/7</li>
-							<li class="list-group-item"><i class="icon-ok text-success"></i>tel:0779499999</li>
-							<li class="list-group-item"><i class="icon-ok text-success"></i>tel:0779499999</li>
-						</ul>
-
-					</div>
-					<!-- /PRICE ITEM -->
-
-
-				</div>
-
-
-				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
-
-					<!-- PRICE ITEM -->
-					<div class="panel price panel-green">
-						<div class="panel-heading arrow_box text-center">
-						<h3>Баткен</h3>
-						</div>
-
-						<ul class="list-group list-group-flush text-center">
-							<li class="list-group-item"><i class="icon-ok text-success"></i> Масалиев кочосу</li>
-							<li class="list-group-item"><i class="icon-ok text-success"></i> дом 27/7</li>
-							<li class="list-group-item"><i class="icon-ok text-success"></i>tel:0779499999</li>
-							<li class="list-group-item"><i class="icon-ok text-success"></i>tel:0779499999</li>
-						</ul>
-
-					</div>
-					<!-- /PRICE ITEM -->
-
-
-				</div>
-
-				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
-
-					<!-- PRICE ITEM -->
 					<div class="panel price panel-green">
 						<div class="panel-heading arrow_box text-center">
 						<h3>Бишкек</h3>
 						</div>
 
 						<ul class="list-group list-group-flush text-center">
-							<li class="list-group-item"><i class="icon-ok text-success"></i> Масалиев кочосу</li>
-							<li class="list-group-item"><i class="icon-ok text-success"></i> дом 27/7</li>
-							<li class="list-group-item"><i class="icon-ok text-success"></i>tel:0779499999</li>
-							<li class="list-group-item"><i class="icon-ok text-success"></i>tel:0779499999</li>
+							<li class="list-group-item"><i class="icon-ok text-success"></i>ул.Тыныбекова 4/перес.Некрасова
+                            (возле чайхана Кара-Суу)</li>
+
+						</ul>
+
+					</div>
+					<!-- /PRICE ITEM -->
+
+
+					</div>
+
+
+				<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+
+					<!-- PRICE ITEM -->
+					<div class="panel price panel-green">
+						<div class="panel-heading arrow_box text-center">
+						<h3>Ош</h3>
+						</div>
+
+						<ul class="list-group list-group-flush text-center">
+							<li class="list-group-item"><i class="icon-ok text-success"></i>ул.Курманжан Датка 281а
+                            (возле гостиницы Алай)</li>
+
 						</ul>
 
 					</div>
@@ -436,6 +395,11 @@
 
 
 				</div>
+
+
+
+
+
 
 				</div>
 			</div>
@@ -455,50 +419,31 @@
 			<div class="container">
 				<div class="row">
 
-					<!-- Single Footer -->
-					<div class="col-sm-3">
-						<div class="single-footer">
-							<div class="footer-logo">
-								<img src="{% static 'main/img/footer-logo.png'%}" alt="Footer Logo" />
-								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
-								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut .</p>
-							</div>
-						</div>
-					</div>
-					<!-- Single Footer -->
+
 
 
 					<!-- Single Footer -->
 					<div class="col-sm-3">
 						<div class="single-footer">
-							<h4>Keep In Touch</h4>
-							<p>44 New Design Street, Melbourne 005 <br />
-							+1 (123) 456-7890-321 <br />
-							info@weburl.com <br />
-							(01) 800 854 633</p>
+							<h4>Бишкек</h4>
+							<p>ул. Тыныбекова 4/пересекает Некрасова <br/>
+                                (возле чайхана Кара-Суу) <br />
+							</p>
 						</div>
 					</div>
 					<!-- Single Footer -->
 
-
-					<!-- Single Footer -->
+                    <!-- Single Footer -->
 					<div class="col-sm-3">
 						<div class="single-footer">
-							<h4>Suscribe</h4>
-							<p>Enter your Email Address For Subscirbe Our Monthly Newsletters</p>
-
-							<form action="">
-								<div class="form-group">
-									<input type="email" class="form-control my-form" id="exampleInputEmail1" placeholder="Enter Your Email Address">
-								</div>
-								<div class="form-group">
-									<button class="btn btn-subscribe">Subscirbe</button>
-								</div>
-							</form>
-
+							<h4>Ош</h4>
+							<p>ул. Курманжан Датка 281а  <br/>
+                                (возле гостиницы Алай) <br />
+							</p>
 						</div>
 					</div>
 					<!-- Single Footer -->
+
 
 					<!-- Single Footer -->
 					<div class="col-sm-3">
@@ -531,7 +476,7 @@
 							</div>
 						</div>
 
-						<div class="col-sm-3">
+						<div class="col-sm-3 offse">
 							<div class="social">
 								<ul>
 									<li><a href="#"><i class="fa fa-facebook"></i></a></li>
