@@ -223,9 +223,9 @@
     <div class="items row">
       {% for product in products %}
         <div class="item col-md-3">
-<a href="{% url 'ProductDetails' product.id %}">
-       <img src="{% if product.image %}{{ product.image.url }}{% endif %}" class="img-responsive " >
-</a>
+            <a href="{% url 'ProductDetails' product.id %}">
+                <img src="{% if product.image %}{{ product.image.url }}{% endif %}" class="img-responsive " >
+            </a>
             <a href="{% url 'ProductDetails' product.id %}"> <h4> {{ product.name }}</h4></a><br>
 
         </div>
@@ -344,9 +344,9 @@
 		<section id="blog" class="site-padding">
 			<div class="container">
 				<div class="row">
-					<div class="col-sm-12">
+					<div class="col-sm-12 ">
 						<div class="title">
-							<h3>Последние <span>Новости</span></h3>
+                            <a href="{% url 'NewsList' %}"><h3>Последние <span>Новости</span></h3></a>
 						</div>
 					</div>
 				</div>
@@ -525,7 +525,7 @@
 			});
 		</script>
 
-		<script src="{% static 'main/js/custom.js'%}"></script>
+{#		<script src="{% static 'main/js/custom.js'%}"></script>#}
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>
             (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
