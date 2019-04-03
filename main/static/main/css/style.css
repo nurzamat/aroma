@@ -85,7 +85,7 @@ ul.navbar-nav li a{
 .is-sticky .main-menu .navbar-inverse{
 	background:#000;
 	transition:0.4s;
-	padding:15px 0;
+	/*padding:15px 0;*/
 }
 
 .is-sticky .main-menu ul.navbar-nav li a{
@@ -197,6 +197,7 @@ ul.navbar-nav li a{
 /*Services*/
 .title h3{
 	text-align:center;
+
 }
 
 .title h3 span{

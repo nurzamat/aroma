@@ -8,7 +8,7 @@
 	<link rel="icon" type="image/png" sizes="96x96" href="{% static 'account/img/favicon.png' %}">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-	<title> {{ product.name }}</title>
+	<title> Продукты</title>
 
 	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
     <meta name="viewport" content="width=device-width" />
@@ -38,40 +38,35 @@
 
 
 {% block navbar %}
-        <nav class="navbar navbar-default">
+<nav class="navbar navbar-default">
           <div class="top container">
-              <a href="{% url 'Products' %}"> Наши продукты </a>
+             Наши продукты
           </div>
-        </nav>
+</nav>
 {% endblock %}
 {% block content %}
  <div class="content">
-            <div class="container-fluid">
+            <div class="container">
                 <div class="row">
-                      <section id="content row" class="container-fluid">
-                       <div class="product-detail" xmlns:cart="http://www.w3.org/1999/xhtml">
-    <div class="col-sm-4">
-      <img src="{% if product.image %}{{ product.image.url }}{% else %}{% endif %}" class="img-responsive">
-    </div>
-    <div class="col-sm-8">
-      <h4>{{ product.name }}</h4>
+                    <section id="content row" >
+                       <div id="main" class="col-sm-12">
 
-      <p class="price text-info">
-        {{ product.price }} y.e.
-      </p>
-
-
-      <span>
-        {{ product.description | linebreaks}}
-      </span>
-    </div>
-  </div>
-                      </section>
-
+                         <div class="items row">
+                            {% for product in products %}
+                                 <div class="item col-sm-3">
+                                     <a href="{% url 'ProductDetails' product.id %}">
+                                         <img src="{% if product.image %}{{ product.image.url }}{% endif %}" class="img-responsive " width="200" height="100">
+                                     </a>
+                                     <a href="{% url 'ProductDetails' product.id %}">{{ product.name }}</a><br>
+                                        {{ product.price }} y.e.
+                                 </div>
+                            {% endfor %}
+                         </div>
+                        </div>
+                    </section>
                 </div>
             </div>
         </div>
-
 
 
 {% endblock %}
