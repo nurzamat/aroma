@@ -353,38 +353,27 @@
 
 				<div class="row">
 
-					<!-- Single Blog -->
-					<div class="col-sm-4">
-						<div class="single-blog">
-							<img src="{% static 'main/img/blog.jpg'%}" alt="Blog Image" />
-							<h4><a href="#">Lorem ipsum dolor sit amet, consectetur adipiscing elit</a></h4>
-							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
-							<a href="#">Read More>></a>
-						</div>
-					</div>
-					<!-- Single Blog -->
 
-					<!-- Single Blog -->
-					<div class="col-sm-4">
+                    {% for new in news %}
+                        <div class="col-sm-4">
 						<div class="single-blog">
-							<img src="{% static 'main/img/blog.jpg'%}" alt="Blog Image" />
-							<h4><a href="#">Lorem ipsum dolor sit amet, consectetur adipiscing elit</a></h4>
-							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
-							<a href="#">Read More>></a>
-						</div>
-					</div>
-					<!-- Single Blog -->
+                        <a href="{% url 'NewsDetail' new.id %}">
+							<img src="{% if new.image %}{{ new.image.url }}{% endif %}" alt="News" />
+                        </a>
+                            <h4> <a href="{% url 'NewsDetail' new.id %}">{{ new.title }}</a></h4>
+                            <p>
+                                {{ new.description|truncatewords:30 }}
+                            </p>
 
-					<!-- Single Blog -->
-					<div class="col-sm-4">
-						<div class="single-blog">
-							<img src="{% static 'main/img/blog.jpg'%}" alt="Blog Image" />
-							<h4><a href="#">Lorem ipsum dolor sit amet, consectetur adipiscing elit</a></h4>
-							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
-							<a href="#">Read More>></a>
+                                <a href="{% url 'NewsDetail' new.id %}" >Читать далее</a>
+
 						</div>
-					</div>
-					<!-- Single Blog -->
+                        </div>
+                    {% endfor %}
+
+
+
+
 
 
 				</div>
@@ -464,9 +453,7 @@
                                 <div class="social">
 								<ul>
 									<li><a href="#"><i class="fa fa-facebook"></i></a></li>
-									<li><a href="#"><i class="fa fa-twitter"></i></a></li>
-									<li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-									<li><a href="#"><i class="fa fa-google-plus"></i></a></li>
+									<li><a href="#"><i class="fa fa-instagram"></i></a></li>
 								</ul>
                                 </div>
 							</div>

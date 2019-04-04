@@ -1,11 +1,13 @@
 from django.shortcuts import render,get_object_or_404
 from shop.models import Product
 from .models import News
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # Create your views here.
 def MainPage(request):
     products = Product.objects.filter(available=True)[0:4]
+    main_news=News.objects.order_by('created')[0:3]
     return render(request, 'main/main.html', {
-        'products': products
+        'products': products,'news':main_news
     })
 
 # Страница с товарами
@@ -23,7 +25,19 @@ def ProductDetails(request, id):
 
 # Страница с новостями
 def NewsList(request):
-    news=News.objects.order_by('updated')
+    news_list=News.objects.order_by('updated')
+    paginator = Paginator(news_list, 10)
+    page = request.GET.get('page')
+
+    try:
+        news = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        news = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        news = paginator.page(paginator.num_pages)
+
     return render(request, 'main/news.html',{'news':news})
 
 def NewsDetail(request,id):
