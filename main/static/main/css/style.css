@@ -65,7 +65,7 @@ icon color: #a1a1a1;
 .navbar-inverse {
   background-color: #fff;
   border-color: transparent;
-  padding:10px 0;
+  padding:7px 0;
 }
 
 ul.navbar-nav li a{
@@ -442,7 +442,7 @@ ul.navbar-nav li a{
 /*Footer*/
 footer{
 	background:#414141;
-	padding:60px 0;
+	padding:25px 0;
 	color:#f8f8f8;
 }
 

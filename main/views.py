@@ -1,13 +1,15 @@
 from django.shortcuts import render,get_object_or_404
 from shop.models import Product
-from .models import News
+from .models import News,Testimonials
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # Create your views here.
 def MainPage(request):
     products = Product.objects.filter(available=True)[0:4]
     main_news=News.objects.order_by('created')[0:3]
+    testims=Testimonials.objects.order_by('name')[0:4]
+    c=testims.count()
     return render(request, 'main/main.html', {
-        'products': products,'news':main_news
+        'products': products,'news':main_news,'testims':testims,'c':c
     })
 
 # Страница с товарами

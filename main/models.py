@@ -16,3 +16,15 @@ class News(models.Model):
 
     def __str__(self):
         return self.title
+
+class Testimonials (models.Model):
+    name=models.CharField(max_length=200,db_index=True,verbose_name="ФИО")
+    profession=models.CharField(max_length=200,verbose_name="Профессия")
+    text=models.TextField(verbose_name="Текст")
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+
+    def __str__(self):
+        return self.name
