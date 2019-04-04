@@ -7,5 +7,6 @@ urlpatterns = [
     path('products/<int:id>', ProductDetails, name='ProductDetails'),
     path('news',NewsList,name='NewsList'),
     path('news/<int:id>', NewsDetail, name='NewsDetail'),
+    path('slides/<int:id>',SlideDetail,name='SlideDetail')
 
 ]
