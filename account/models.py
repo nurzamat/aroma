@@ -19,6 +19,7 @@ class Node(MPTTModel):
     step = models.IntegerField(default=0)
     cycle = models.IntegerField(default=0)
     activate_date = models.DateTimeField(auto_now=True, blank=True, null=True)
+    reg_date = models.DateTimeField(auto_now=False, blank=True, null=True)
     user_parent = models.ForeignKey(User, null=True, blank=True, related_name='user_children', on_delete=models.DO_NOTHING)
     parent = TreeForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.CASCADE)
 

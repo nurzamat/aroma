@@ -61,6 +61,7 @@ def signup(request):
                                                            'packages': packages, 'parent': parent})
 
         user_parent = get_object_or_404(User, pk=int(parent))
+        is_right = False
         if tree_parent == '':
             # auto define node
             node = get_object_or_404(Node, user=user_parent)
@@ -68,8 +69,10 @@ def signup(request):
             right_node, right_count = get_tree_parent_node(node, True, 0)
             if left_count > right_count:
                 parent_node = right_node
+                is_right = True
             else:
                 parent_node = left_node
+                is_right = False
         else:
             parent_node = get_object_or_404(Node, pk=int(tree_parent))
             children = Node.objects.filter(parent=parent_node)
@@ -77,12 +80,19 @@ def signup(request):
                 return render(request, 'account/signup.html',
                               {'alert': "Данный tree parent занят", 'packages': packages, 'parent': parent})
 
+            if children and children.count() == 1:
+                child = children.first()
+                if child.is_right:
+                    is_right = False
+                else:
+                    is_right = True
+
         try:
             with transaction.atomic():
                 node, user, user_profile = save_registration(address, city, country, username, email, first_name,
                                                              last_name,
                                                              middle_name, package_id, packages, parent_node, password,
-                                                             phone, user_parent)
+                                                             phone, user_parent, is_right)
         except IntegrityError:
             return render(request, 'account/signup.html', {'alert': "Ошибка при регистрации", 'packages': packages,
                                                            'parent': parent})
@@ -110,12 +120,7 @@ def get_tree_parent_node(node, is_right, count):
 
 
 def save_registration(address, city, country, username, email, first_name, last_name, middle_name, package_id, packages,
-                      parent_node, password, phone, user_parent):
-    desc_count = 0
-    if parent_node.children:
-        desc_count = parent_node.children.all().count()
-    if desc_count > 1:
-        raise ValueError("Children count > 1")
+                      parent_node, password, phone, user_parent, is_right):
 
     user = User(username=username, email=email, first_name=first_name, last_name=last_name, is_staff=1)
     user.set_password(password)
@@ -124,9 +129,7 @@ def save_registration(address, city, country, username, email, first_name, last_
     user_profile = UserProfile.objects.create(user=user, first_name=first_name, last_name=last_name,
                                               middle_name=middle_name, phone=phone, email=email, city=city,
                                               country=country, address=address, package=package)
-    is_right = False
-    if desc_count == 1:
-        is_right = True
+
     node = Node.objects.create(user=user, name=user.first_name + " " + user.last_name, parent=parent_node,
                                user_parent=user_parent, is_right=is_right)
 
