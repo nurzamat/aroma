@@ -12,6 +12,7 @@ class Node(MPTTModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, unique=True, null=True)
     is_right = models.BooleanField(default=0)
+    status = models.IntegerField(default=0, null=True)  # 1-active, 0-free
     total_point = models.IntegerField(default=0)
     left_point = models.IntegerField(default=0)
     right_point = models.IntegerField(default=0)
