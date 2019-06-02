@@ -31,7 +31,7 @@ def user_login(request):
 def signup(request):
     packages = Package.objects.all()
     if request.method == "POST":
-        parent = request.POST.get('parent')
+        inviter = request.POST.get('inviter')
         email_phone = request.POST.get('email_phone')
         tree_parent = request.POST.get('parent_id')
         package_id = request.POST.get('package_id')
@@ -51,20 +51,20 @@ def signup(request):
             email = ''
             phone = email_phone
 
-        if parent == '':
+        if inviter == '':
             return render(request, 'account/signup.html', {'alert': "Регистрируйтесь по реферальной ссылке",
-                                                           'packages': packages, 'parent': parent})
+                                                           'packages': packages, 'inviter': inviter})
 
         username_exists = User.objects.filter(username__iexact=username).exists()
         if username_exists:
             return render(request, 'account/signup.html', {'alert': "Такой логин существует в системе",
-                                                           'packages': packages, 'parent': parent})
+                                                           'packages': packages, 'inviter': inviter})
 
-        user_parent = get_object_or_404(User, pk=int(parent))
+        inviter_node = get_object_or_404(Node, pk=int(inviter))
         is_right = False
         if tree_parent == '':
             # auto define node
-            node = get_object_or_404(Node, user=user_parent)
+            node = get_object_or_404(Node, inviter=inviter_node)
             left_node, left_count = get_tree_parent_node(node, False, 0)
             right_node, right_count = get_tree_parent_node(node, True, 0)
             if left_count > right_count:
@@ -75,13 +75,11 @@ def signup(request):
                 is_right = False
         else:
             parent_node = get_object_or_404(Node, pk=int(tree_parent))
-            children = Node.objects.filter(parent=parent_node)
-            if children and children.count() > 1:
+            if parent_node.children.count() > 1:
                 return render(request, 'account/signup.html',
-                              {'alert': "Данный tree parent занят", 'packages': packages, 'parent': parent})
-
-            if children and children.count() == 1:
-                child = children.first()
+                              {'alert': "Данный tree parent занят", 'packages': packages, 'inviter': inviter})
+            elif parent_node.children.count() == 1:
+                child = parent_node.children.first()
                 if child.is_right:
                     is_right = False
                 else:
@@ -92,22 +90,22 @@ def signup(request):
                 node, user, user_profile = save_registration(address, city, country, username, email, first_name,
                                                              last_name,
                                                              middle_name, package_id, packages, parent_node, password,
-                                                             phone, user_parent, is_right)
+                                                             phone, inviter, is_right)
         except IntegrityError:
             return render(request, 'account/signup.html', {'alert': "Ошибка при регистрации", 'packages': packages,
-                                                           'parent': parent})
+                                                           'inviter': inviter})
 
         if user and user_profile and node:
             login(request, user)
             return redirect('account:home')
         else:
             return render(request, 'account/signup.html', {'alert': "Ошибка регистрации", 'packages': packages,
-                                                           'parent': parent})
+                                                           'inviter': inviter})
     else:
-        parent = ''
-        if request.GET.get('parent'):
-            parent = request.GET.get('parent')
-        return render(request, 'account/signup.html', {'packages': packages, 'parent': parent})
+        inviter = ''
+        if request.GET.get('inviter'):
+            inviter = request.GET.get('inviter')
+        return render(request, 'account/signup.html', {'packages': packages, 'inviter': inviter})
 
 
 def get_tree_parent_node(node, is_right, count):
@@ -120,7 +118,7 @@ def get_tree_parent_node(node, is_right, count):
 
 
 def save_registration(address, city, country, username, email, first_name, last_name, middle_name, package_id, packages,
-                      parent_node, password, phone, user_parent, is_right):
+                      parent_node, password, phone, inviter, is_right):
 
     user = User(username=username, email=email, first_name=first_name, last_name=last_name, is_staff=1)
     user.set_password(password)
@@ -131,9 +129,9 @@ def save_registration(address, city, country, username, email, first_name, last_
                                               country=country, address=address, package=package)
 
     node = Node.objects.create(user=user, name=user.first_name + " " + user.last_name, parent=parent_node,
-                               user_parent=user_parent, is_right=is_right)
+                               inviter=inviter, is_right=is_right)
 
-    calculate_bonus(user, user_parent)
+    #calculate_bonus(user, inviter)
 
     return node, user, user_profile
 
@@ -237,7 +235,7 @@ def structure(request):
 def invited(request):
     user = request.user
     node = get_object_or_404(Node, user=user)
-    nodes = Node.objects.filter(user_parent=user)
+    nodes = Node.objects.filter(inviter=node)
     return render(request, 'account/invited.html', {'node': node, 'nodes': nodes})
 
 
@@ -246,11 +244,11 @@ def invited_ajax(request):
     user = request.user
     level = int(request.GET.get('level'))
     s = 1
-    ids = Node.objects.filter(user_parent=user).values_list('user_id', flat=True)
+    ids = Node.objects.filter(inviter=user.node).values_list('inviter_id', flat=True)
     while s < level:
         s = s + 1
-        ids = Node.objects.filter(user_parent__pk__in=ids).values_list('user_id', flat=True)
-    nodes = Node.objects.filter(user__pk__in=ids)
+        ids = Node.objects.filter(inviter__pk__in=ids).values_list('inviter_id', flat=True)
+    nodes = Node.objects.filter(inviter__pk__in=ids)
     return render(request, 'account/invited_ajax.html', {'nodes': nodes})
 
 

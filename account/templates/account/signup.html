@@ -51,7 +51,7 @@
                             <div class="content">
                                 <form action="{% url 'account:signup' %}" method="post">
                                     {% csrf_token %}
-                                <input type="hidden" name="parent" value="{{ parent }}">
+                                <input type="hidden" name="inviter" value="{{ inviter }}">
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
