@@ -131,72 +131,58 @@ def save_registration(address, city, country, username, email, first_name, last_
     node = Node.objects.create(user=user, name=user.first_name + " " + user.last_name, parent=parent_node,
                                inviter=inviter, is_right=is_right)
 
-    #calculate_bonus(user, inviter)
+    calculate_bonus(node, inviter)
 
     return node, user, user_profile
 
 
-def calculate_bonus(user, user_parent):
+def calculate_bonus(node, inviter):
     # bonus
-    if user_parent:
+    if inviter:
         bonus_settings = BonusSettings.objects.all()
         bonus_types = BonusType.objects.all()
         recommendation_type = bonus_types.get(code=1)
-        step_type = bonus_types.get(code=2)
+        # step_type = bonus_types.get(code=2)
         cycle_type = bonus_types.get(code=3)
-
-        inviter_node = Node.objects.get(user=user_parent)
 
         # bonus for recommendation
         recommendation_bonus_value = bonus_settings.get(bonus_type=recommendation_type, level=1).bonus_value
-        Bonus.objects.create(user=user_parent, value=recommendation_bonus_value, partner=user,
+        Bonus.objects.create(node=inviter, value=recommendation_bonus_value, partner=node,
                              type=recommendation_type.name)
 
-        if inviter_node.bonus is None:
-            inviter_node.bonus = recommendation_bonus_value
+        if inviter.bonus is None:
+            inviter.bonus = recommendation_bonus_value
         else:
-            inviter_node.bonus = inviter_node.bonus + recommendation_bonus_value
+            inviter.bonus = inviter.bonus + recommendation_bonus_value
+        inviter.save()
 
-        # bonus for step
-        left_count = 0
-        right_count = 0
+        # bonus for registration
+        price_som = node.package.price_som
+        calculate_parent_bonus(cycle_type, node, price_som)
 
-        try:
-            right_child = Node.objects.get(parent=inviter_node, is_right=True)
-            right_count = right_child.get_descendant_count() + 1
-        except Node.DoesNotExist:
-            right_child = None
 
-        try:
-            left_child = Node.objects.get(parent=inviter_node, is_right=False)
-            left_count = left_child.get_descendant_count() + 1
-        except Node.DoesNotExist:
-            left_child = None
+def calculate_parent_bonus(cycle_type, node, price_som):
+    is_right = node.is_right
+    parent = node.parent
+    if is_right:
+        parent.right_point = parent.right_point + parent.package.percent * price_som * 0.01
+    else:
+        parent.left_point = parent.left_point + parent.package.percent * price_som * 0.01
+    bonus = 0
+    if parent.right_point > parent.left_point:
+        bonus = parent.left_point
+    elif parent.right_point < parent.left_point:
+        bonus = parent.right_point
+    else:
+        bonus = parent.right_point
+    parent.right_point = parent.right_point - bonus
+    parent.left_point = parent.left_point - bonus
+    parent.save()
+    if bonus > 0:
+        Bonus.objects.create(node=parent, value=bonus, partner=node,
+                             type=cycle_type.name)
 
-        if left_child and right_child:
-            try:
-                step_settings = bonus_settings.get(bonus_type=step_type, level=inviter_node.step + 1)
-                summ_boolean = left_count + right_count >= step_settings.left + step_settings.right
-                diff_boolean = abs(left_count - right_count) <= step_settings.diff
-                if summ_boolean and diff_boolean:
-                    Bonus.objects.create(user=user_parent, value=step_settings.bonus_value,
-                                         partner=user, type=step_type.name)
-                    inviter_node.bonus = inviter_node.bonus + step_settings.bonus_value
-                    inviter_node.step = inviter_node.step + 1
-                    # bonus for cycle
-                    last_level_exist = bonus_settings.filter(bonus_type=step_type, level=inviter_node.step + 1).exists()
-                    if not last_level_exist:
-                        try:
-                            cycle_settings = bonus_settings.get(bonus_type=cycle_type, level=inviter_node.cycle + 1)
-                            Bonus.objects.create(user=user_parent, value=cycle_settings.bonus_value,
-                                                 partner=user, type=cycle_type.name)
-                            inviter_node.bonus = inviter_node.bonus + cycle_settings.bonus_value
-                            inviter_node.cycle = inviter_node.cycle + 1
-                        except BonusSettings.DoesNotExist:
-                            pass
-            except BonusSettings.DoesNotExist:
-                pass
-        inviter_node.save()
+    return calculate_parent_bonus(cycle_type, parent, price_som)
 
 
 def validate_username_ajax(request):
@@ -232,7 +218,7 @@ def structure(request):
 @login_required
 def invited(request):
     user = request.user
-    node = get_object_or_404(Node, user=user)
+    node = user.node
     nodes = Node.objects.filter(inviter=node)
     return render(request, 'account/invited.html', {'node': node, 'nodes': nodes})
 

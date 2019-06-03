@@ -8,9 +8,20 @@ from django.dispatch import receiver
 from decimal import Decimal
 
 
+class Package(models.Model):
+    name = models.CharField(max_length=50)
+    percent = models.IntegerField(default=0)
+    point = models.IntegerField(default=0)
+    price_som = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Node(MPTTModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, unique=True, null=True)
+    package = models.ForeignKey(Package, null=True, on_delete=models.DO_NOTHING)
     is_right = models.BooleanField(default=0)
     total_point = models.IntegerField(default=0)
     left_point = models.IntegerField(default=0)
@@ -30,18 +41,8 @@ class Node(MPTTModel):
         return self.name
 
 
-class Package(models.Model):
-    name = models.CharField(max_length=50)
-    point = models.IntegerField(default=0)
-    price_som = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    package = models.ForeignKey(Package, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=60, null=True)
     last_name = models.CharField(max_length=60, null=True)
     middle_name = models.CharField(max_length=60, null=True)
