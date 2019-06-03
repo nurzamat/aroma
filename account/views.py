@@ -169,9 +169,9 @@ def calculate_parent_bonus(cycle_type, node, price_som):
     if parent is None:
         return
     if is_right:
-        parent.right_point = parent.right_point + int(parent.package.percent * price_som * 0.01)
+        parent.right_point = parent.right_point + (parent.package.percent * price_som)/100
     else:
-        parent.left_point = parent.left_point + int(parent.package.percent * price_som * 0.01)
+        parent.left_point = parent.left_point + (parent.package.percent * price_som)/100
     bonus = 0
     if parent.right_point > parent.left_point:
         bonus = parent.left_point
