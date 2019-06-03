@@ -126,10 +126,10 @@ def save_registration(address, city, country, username, email, first_name, last_
     package = packages.get(pk=package_id)
     user_profile = UserProfile.objects.create(user=user, first_name=first_name, last_name=last_name,
                                               middle_name=middle_name, phone=phone, email=email, city=city,
-                                              country=country, address=address, package=package)
+                                              country=country, address=address)
 
     node = Node.objects.create(user=user, name=user.first_name + " " + user.last_name, parent=parent_node,
-                               inviter=inviter, is_right=is_right)
+                               inviter=inviter, is_right=is_right, package=package)
 
     calculate_bonus(node, inviter)
 
