@@ -175,10 +175,11 @@ def calculate_parent_bonus(cycle_type, node, price_som):
         bonus = parent.right_point
     else:
         bonus = parent.right_point
-    parent.right_point = parent.right_point - bonus
-    parent.left_point = parent.left_point - bonus
-    parent.save()
     if bonus > 0:
+        parent.right_point = parent.right_point - bonus
+        parent.left_point = parent.left_point - bonus
+        parent.bonus = parent.bonus + bonus
+        parent.save()
         Bonus.objects.create(node=parent, value=bonus, partner=node,
                              type=cycle_type.name)
 
