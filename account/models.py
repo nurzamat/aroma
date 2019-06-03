@@ -66,9 +66,9 @@ class BonusType(models.Model):
 
 
 class Bonus(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bonus_user")
+    node = models.ForeignKey(Node, on_delete=models.CASCADE, related_name="bonus_node", null=True)
     value = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    partner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bonus_partner", null=True)
+    partner = models.ForeignKey(Node, on_delete=models.CASCADE, related_name="bonus_partner", null=True)
     type = models.CharField(max_length=60, null=True, blank=True)
     created_date = models.DateTimeField(auto_now=True, blank=True, null=True)
 
