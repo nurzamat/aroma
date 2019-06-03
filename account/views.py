@@ -218,9 +218,7 @@ def user_logout(request):
 @login_required
 def home(request):
     user = request.user
-    node = get_object_or_404(Node, user=user)
-    profile = get_object_or_404(UserProfile, user=user)
-    return render(request, 'account/home.html', {'node': node, 'user': user, 'profile': profile})
+    return render(request, 'account/home.html', {'node': user.node, 'user': user, 'profile': user.userprofile})
 
 
 @login_required
