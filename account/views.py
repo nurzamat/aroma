@@ -164,6 +164,8 @@ def calculate_bonus(node, inviter):
 def calculate_parent_bonus(cycle_type, node, price_som):
     is_right = node.is_right
     parent = node.parent
+    if parent is None:
+        return
     if is_right:
         parent.right_point = parent.right_point + parent.package.percent * price_som * 0.01
     else:
