@@ -64,8 +64,8 @@
   <script>
       $(document).ready(function(){
 
-          var activate_date = $('#activate_date').val();
-          var date = new Date(activate_date).getTime();
+          var expired_date = $('#expired_date').val();
+          var date = new Date(expired_date).getTime();
 
 // Set the date we're counting down to
 //var countDownDate = new Date("May 17, 2019 15:37:25").getTime();
@@ -196,7 +196,7 @@ var x = setInterval(function() {
                                         <div class="numbers">
                                             <p>Активация</p>
                                             <p id="timer_val" style="color:green; size: 12px"></p>
-                                            <input type="hidden" id="activate_date" value="{{ node.activate_date|date:"c"}}">
+                                            <input type="hidden" id="expired_date" value="{{ node.expired_date|date:"c"}}">
                                         </div>
                                     </div>
                                 </div>
@@ -214,7 +214,7 @@ var x = setInterval(function() {
                     <div class="col-lg-8 col-md-7">
                         <div class="form-group">
                         <label>Ваша реферальная ссылка</label>
-                        <input type="text"  name="referal"  class="form-control border-input" value="http://aromals.org/account/signup?parent={{user.id }}">
+                        <input type="text"  name="referal"  class="form-control border-input" value="http://95.179.198.148/account/signup?inviter={{node.pk }}">
                         </div>
                     </div>
                 </div>

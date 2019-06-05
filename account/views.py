@@ -31,7 +31,7 @@ def user_login(request):
 def signup(request):
     packages = Package.objects.all()
     if request.method == "POST":
-        parent = request.POST.get('parent')
+        inviter = request.POST.get('inviter')
         email_phone = request.POST.get('email_phone')
         tree_parent = request.POST.get('parent_id')
         package_id = request.POST.get('package_id')
@@ -51,37 +51,37 @@ def signup(request):
             email = ''
             phone = email_phone
 
-        if parent == '':
+        if inviter == '':
             return render(request, 'account/signup.html', {'alert': "Регистрируйтесь по реферальной ссылке",
-                                                           'packages': packages, 'parent': parent})
+                                                           'packages': packages, 'inviter': inviter})
 
         username_exists = User.objects.filter(username__iexact=username).exists()
         if username_exists:
             return render(request, 'account/signup.html', {'alert': "Такой логин существует в системе",
-                                                           'packages': packages, 'parent': parent})
+                                                           'packages': packages, 'inviter': inviter})
 
-        user_parent = get_object_or_404(User, pk=int(parent))
+        inviter_node = get_object_or_404(Node, pk=int(inviter))
         is_right = False
         if tree_parent == '':
+            return render(request, 'account/signup.html', {'alert': "Укажите parent id",
+                                                           'packages': packages, 'inviter': inviter})
             # auto define node
-            node = get_object_or_404(Node, user=user_parent)
-            left_node, left_count = get_tree_parent_node(node, False, 0)
-            right_node, right_count = get_tree_parent_node(node, True, 0)
-            if left_count > right_count:
-                parent_node = right_node
-                is_right = True
-            else:
-                parent_node = left_node
-                is_right = False
+            # node = get_object_or_404(Node, inviter=inviter_node)
+            # left_node, left_count = get_tree_parent_node(node, False, 0)
+            # right_node, right_count = get_tree_parent_node(node, True, 0)
+            # if left_count > right_count:
+            #    parent_node = right_node
+            #    is_right = True
+            # else:
+            #    parent_node = left_node
+            #    is_right = False
         else:
             parent_node = get_object_or_404(Node, pk=int(tree_parent))
-            children = Node.objects.filter(parent=parent_node)
-            if children and children.count() > 1:
+            if parent_node.children.count() > 1:
                 return render(request, 'account/signup.html',
-                              {'alert': "Данный tree parent занят", 'packages': packages, 'parent': parent})
-
-            if children and children.count() == 1:
-                child = children.first()
+                              {'alert': "Данный tree parent занят", 'packages': packages, 'inviter': inviter})
+            elif parent_node.children.count() == 1:
+                child = parent_node.children.first()
                 if child.is_right:
                     is_right = False
                 else:
@@ -92,22 +92,22 @@ def signup(request):
                 node, user, user_profile = save_registration(address, city, country, username, email, first_name,
                                                              last_name,
                                                              middle_name, package_id, packages, parent_node, password,
-                                                             phone, user_parent, is_right)
+                                                             phone, inviter_node, is_right)
         except IntegrityError:
             return render(request, 'account/signup.html', {'alert': "Ошибка при регистрации", 'packages': packages,
-                                                           'parent': parent})
+                                                           'inviter': inviter})
 
         if user and user_profile and node:
             login(request, user)
             return redirect('account:home')
         else:
             return render(request, 'account/signup.html', {'alert': "Ошибка регистрации", 'packages': packages,
-                                                           'parent': parent})
+                                                           'inviter': inviter})
     else:
-        parent = ''
-        if request.GET.get('parent'):
-            parent = request.GET.get('parent')
-        return render(request, 'account/signup.html', {'packages': packages, 'parent': parent})
+        inviter = ''
+        if request.GET.get('inviter'):
+            inviter = request.GET.get('inviter')
+        return render(request, 'account/signup.html', {'packages': packages, 'inviter': inviter})
 
 
 def get_tree_parent_node(node, is_right, count):
@@ -120,7 +120,7 @@ def get_tree_parent_node(node, is_right, count):
 
 
 def save_registration(address, city, country, username, email, first_name, last_name, middle_name, package_id, packages,
-                      parent_node, password, phone, user_parent, is_right):
+                      parent_node, password, phone, inviter, is_right):
 
     user = User(username=username, email=email, first_name=first_name, last_name=last_name, is_staff=1)
     user.set_password(password)
@@ -128,77 +128,65 @@ def save_registration(address, city, country, username, email, first_name, last_
     package = packages.get(pk=package_id)
     user_profile = UserProfile.objects.create(user=user, first_name=first_name, last_name=last_name,
                                               middle_name=middle_name, phone=phone, email=email, city=city,
-                                              country=country, address=address, package=package)
+                                              country=country, address=address)
 
     node = Node.objects.create(user=user, name=user.first_name + " " + user.last_name, parent=parent_node,
-                               user_parent=user_parent, is_right=is_right)
+                               inviter=inviter, is_right=is_right, package=package)
 
-    calculate_bonus(user, user_parent)
+    calculate_bonus(node, inviter)
 
     return node, user, user_profile
 
 
-def calculate_bonus(user, user_parent):
+def calculate_bonus(node, inviter):
     # bonus
-    if user_parent:
+    if inviter:
         bonus_settings = BonusSettings.objects.all()
         bonus_types = BonusType.objects.all()
         recommendation_type = bonus_types.get(code=1)
-        step_type = bonus_types.get(code=2)
+        # step_type = bonus_types.get(code=2)
         cycle_type = bonus_types.get(code=3)
-
-        inviter_node = Node.objects.get(user=user_parent)
 
         # bonus for recommendation
         recommendation_bonus_value = bonus_settings.get(bonus_type=recommendation_type, level=1).bonus_value
-        Bonus.objects.create(user=user_parent, value=recommendation_bonus_value, partner=user,
+        Bonus.objects.create(node=inviter, value=recommendation_bonus_value, partner=node,
                              type=recommendation_type.name)
 
-        if inviter_node.bonus is None:
-            inviter_node.bonus = recommendation_bonus_value
+        if inviter.bonus is None:
+            inviter.bonus = recommendation_bonus_value
         else:
-            inviter_node.bonus = inviter_node.bonus + recommendation_bonus_value
+            inviter.bonus = inviter.bonus + recommendation_bonus_value
+        inviter.save()
 
-        # bonus for step
-        left_count = 0
-        right_count = 0
+        # bonus for registration
+        price_som = node.package.price_som
+        calculate_parent_bonus(cycle_type, node, price_som)
 
-        try:
-            right_child = Node.objects.get(parent=inviter_node, is_right=True)
-            right_count = right_child.get_descendant_count() + 1
-        except Node.DoesNotExist:
-            right_child = None
 
-        try:
-            left_child = Node.objects.get(parent=inviter_node, is_right=False)
-            left_count = left_child.get_descendant_count() + 1
-        except Node.DoesNotExist:
-            left_child = None
-
-        if left_child and right_child:
-            try:
-                step_settings = bonus_settings.get(bonus_type=step_type, level=inviter_node.step + 1)
-                summ_boolean = left_count + right_count >= step_settings.left + step_settings.right
-                diff_boolean = abs(left_count - right_count) <= step_settings.diff
-                if summ_boolean and diff_boolean:
-                    Bonus.objects.create(user=user_parent, value=step_settings.bonus_value,
-                                         partner=user, type=step_type.name)
-                    inviter_node.bonus = inviter_node.bonus + step_settings.bonus_value
-                    inviter_node.step = inviter_node.step + 1
-                    # bonus for cycle
-                    last_level_exist = bonus_settings.filter(bonus_type=step_type, level=inviter_node.step + 1).exists()
-                    if not last_level_exist:
-                        try:
-                            cycle_settings = bonus_settings.get(bonus_type=cycle_type, level=inviter_node.cycle + 1)
-                            Bonus.objects.create(user=user_parent, value=cycle_settings.bonus_value,
-                                                 partner=user, type=cycle_type.name)
-                            inviter_node.bonus = inviter_node.bonus + cycle_settings.bonus_value
-                            inviter_node.cycle = inviter_node.cycle + 1
-                        except BonusSettings.DoesNotExist:
-                            pass
-            except BonusSettings.DoesNotExist:
-                pass
-        inviter_node.save()
+def calculate_parent_bonus(cycle_type, node, price_som):
+    is_right = node.is_right
+    parent = node.parent
+    if parent is None:
+        return
+    if is_right:
+        parent.right_point = parent.right_point + (parent.package.percent * price_som)/100
+    else:
+        parent.left_point = parent.left_point + (parent.package.percent * price_som)/100
+    bonus = 0
+    if parent.right_point > parent.left_point:
+        bonus = parent.left_point
+    elif parent.right_point < parent.left_point:
+        bonus = parent.right_point
+    else:
+        bonus = parent.right_point
+    if bonus > 0:
+        parent.right_point = parent.right_point - bonus
+        parent.left_point = parent.left_point - bonus
+        parent.bonus = parent.bonus + bonus
+        Bonus.objects.create(node=parent, value=bonus, partner=node,
+                             type=cycle_type.name)
+    parent.save()
+    return calculate_parent_bonus(cycle_type, parent, price_som)
 
 
 def validate_username_ajax(request):
@@ -220,9 +208,7 @@ def user_logout(request):
 @login_required
 def home(request):
     user = request.user
-    node = get_object_or_404(Node, user=user)
-    profile = get_object_or_404(UserProfile, user=user)
-    return render(request, 'account/home.html', {'node': node, 'user': user, 'profile': profile})
+    return render(request, 'account/home.html', {'node': user.node, 'user': user, 'profile': user.userprofile})
 
 
 @login_required
@@ -236,8 +222,8 @@ def structure(request):
 @login_required
 def invited(request):
     user = request.user
-    node = get_object_or_404(Node, user=user)
-    nodes = Node.objects.filter(user_parent=user)
+    node = user.node
+    nodes = Node.objects.filter(inviter=node)
     return render(request, 'account/invited.html', {'node': node, 'nodes': nodes})
 
 
@@ -246,11 +232,11 @@ def invited_ajax(request):
     user = request.user
     level = int(request.GET.get('level'))
     s = 1
-    ids = Node.objects.filter(user_parent=user).values_list('user_id', flat=True)
+    ids = Node.objects.filter(inviter=user.node).values_list('inviter_id', flat=True)
     while s < level:
         s = s + 1
-        ids = Node.objects.filter(user_parent__pk__in=ids).values_list('user_id', flat=True)
-    nodes = Node.objects.filter(user__pk__in=ids)
+        ids = Node.objects.filter(inviter__pk__in=ids).values_list('inviter_id', flat=True)
+    nodes = Node.objects.filter(inviter__pk__in=ids)
     return render(request, 'account/invited_ajax.html', {'nodes': nodes})
 
 
@@ -258,8 +244,8 @@ def invited_ajax(request):
 def bonus_history(request):
     user = request.user
     node = user.node
-    history = Bonus.objects.filter(user=user).order_by('-created_date')
-    total_sum = Bonus.objects.filter(user=user).aggregate(Sum('value'))['value__sum'] or 0.00
+    history = Bonus.objects.filter(node=node).order_by('-created_date')
+    total_sum = Bonus.objects.filter(node=node).aggregate(Sum('value'))['value__sum'] or 0.00
     return render(request, 'account/bonus_history.html', {'node': node, 'total_sum': total_sum, 'history': history})
 
 

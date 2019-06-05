@@ -51,7 +51,7 @@
                             <div class="content">
                                 <form action="{% url 'account:signup' %}" method="post">
                                     {% csrf_token %}
-                                <input type="hidden" name="parent" value="{{ parent }}">
+                                <input type="hidden" name="inviter" value="{{ inviter }}">
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
@@ -85,7 +85,7 @@
                                                         {% if packages %}
                                                              <select name="package_id" class="form-control border-input">
                                                           {% for package in packages %}
-                                                              <option value="{{ package.id }}">{{ package.name }} - {{ package.point }}</option>
+                                                              <option value="{{ package.id }}">{{ package.name }} - {{ package.percent }} %</option>
                                                          {% endfor %}
                                                              </select>
                                                        {% endif %}

@@ -8,9 +8,20 @@ from django.dispatch import receiver
 from decimal import Decimal
 
 
+class Package(models.Model):
+    name = models.CharField(max_length=50)
+    percent = models.IntegerField(default=0)
+    point = models.IntegerField(default=0)
+    price_som = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Node(MPTTModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, unique=True, null=True)
+    package = models.ForeignKey(Package, null=True, on_delete=models.DO_NOTHING)
     is_right = models.BooleanField(default=0)
     status = models.IntegerField(default=0, null=True)  # 1-active, 0-free
     total_point = models.IntegerField(default=0)
@@ -19,9 +30,9 @@ class Node(MPTTModel):
     bonus = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'), blank=True, null=True)
     step = models.IntegerField(default=0)
     cycle = models.IntegerField(default=0)
-    activate_date = models.DateTimeField(auto_now=True, blank=True, null=True)
-    reg_date = models.DateTimeField(auto_now=False, blank=True, null=True)
-    user_parent = models.ForeignKey(User, null=True, blank=True, related_name='user_children', on_delete=models.DO_NOTHING)
+    expired_date = models.DateTimeField(auto_now=True, blank=True, null=True)
+    created_date = models.DateTimeField(auto_now=False, blank=True, null=True)
+    inviter = models.ForeignKey("Node", null=True, blank=True, related_name='invited_children', on_delete=models.DO_NOTHING)
     parent = TreeForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.CASCADE)
 
     class Meta:
@@ -31,18 +42,8 @@ class Node(MPTTModel):
         return self.name
 
 
-class Package(models.Model):
-    name = models.CharField(max_length=50)
-    point = models.IntegerField(default=0)
-    price_som = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    package = models.ForeignKey(Package, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=60, null=True)
     last_name = models.CharField(max_length=60, null=True)
     middle_name = models.CharField(max_length=60, null=True)
@@ -66,9 +67,9 @@ class BonusType(models.Model):
 
 
 class Bonus(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bonus_user")
+    node = models.ForeignKey(Node, on_delete=models.CASCADE, related_name="bonus_node", null=True)
     value = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    partner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bonus_partner", null=True)
+    partner = models.ForeignKey(Node, on_delete=models.CASCADE, related_name="bonus_partner", null=True)
     type = models.CharField(max_length=60, null=True, blank=True)
     created_date = models.DateTimeField(auto_now=True, blank=True, null=True)
 
