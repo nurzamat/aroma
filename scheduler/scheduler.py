@@ -6,5 +6,5 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 def start():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(bonus_calculation.calculate_bonus_test(), 'interval', minutes=1)
+    scheduler.add_job(bonus_calculation.calculate_bonus_test, 'interval', minutes=1)
     scheduler.start()
