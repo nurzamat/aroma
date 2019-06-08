@@ -353,7 +353,12 @@
                         <div class="col-sm-4">
 						<div class="single-blog">
                         <a href="{% url 'NewsDetail' new.id %}">
-							<img src="{% if new.image %}{{ new.image.url }}{% endif %}" alt="News" />
+                            {% if new.image %}
+							<img src="{{ new.image.url }}" alt="News" />
+                            {% endif %}
+                        {% if new.video %}
+                            <iframe width="100%" height="450" src="{{ new.video }}" frameborder="0" allowfullscreen></iframe>
+                        {% endif %}
                         </a>
                             <h4> <a href="{% url 'NewsDetail' new.id %}">{{ new.title }}</a></h4>
                             <p>

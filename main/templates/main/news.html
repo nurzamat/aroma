@@ -80,7 +80,7 @@
 						<div class="single-blog">
 
 							<a href="{% url 'NewsDetail' new.id %}"><h3>{{ new.title }}</h3></a>
-							<img src="{% if new.image %}{{ new.image.url }}{% endif %}" alt="News" />
+							<!--<img src="{% if new.image %}{{ new.image.url }}{% endif %}" alt="News" />-->
 
                             {% if new.image %}
 							<img src="{{ new.image.url }}" alt="News" />
