@@ -357,7 +357,10 @@
 							<img src="{{ new.image.url }}" alt="News" />
                             {% endif %}
                         {% if new.video %}
-                            <iframe width="100%" height="450" src="{{ new.video }}" frameborder="0" allowfullscreen></iframe>
+                            <video poster="http://95.179.198.148/media/poster.jpg" width="100%" height="450" controls="true">
+                               <source src="{{ new.video }}" type="video/mp4" />
+                            </video>
+                            <!--<iframe width="100%" height="450" src="{{ new.video }}" frameborder="0" allowfullscreen></iframe>-->
                         {% endif %}
                         </a>
                             <h4> <a href="{% url 'NewsDetail' new.id %}">{{ new.title }}</a></h4>
