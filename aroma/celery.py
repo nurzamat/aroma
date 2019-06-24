@@ -17,3 +17,8 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 def debug_task(self):
     print('Request: {0!r}'.format(self.request))
 
+
+@app.task(bind=True)
+def bonus_calculation(self):
+    print('Request: {0!r}'.format(self.request))
+
