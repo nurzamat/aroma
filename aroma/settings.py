@@ -155,7 +155,8 @@ MEDIA_URL = '/media/'
 LOGIN_URL = '/account/user_login'
 
 # CELERY STUFF
-BROKER_URL = 'redis://localhost:6379'
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+# CELERY_BROKER_URL = 'redis://localhost:6379'
 # CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_ACCEPT_CONTENT = ['application/json']
