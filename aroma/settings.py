@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'mptt',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_celery_results',
+    'django_celery_beat',
     'shop',
     'cart',
     'orders',
@@ -154,11 +156,12 @@ LOGIN_URL = '/account/user_login'
 
 # CELERY STUFF
 BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'django-db'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-# CELERY_TIMEZONE = 'Europe/Oslo'
+CELERY_TIMEZONE = 'Europe/London'
 # enable_utc = True
 
 
