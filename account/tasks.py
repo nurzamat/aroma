@@ -22,7 +22,7 @@ def task_calculate_bonus_test():
     logger.info("Saved image from Flickr")
 
 
-# @task()
+@task()
 def task_calculate_bonus():
     logger.info("calculate bonus starts")
 
