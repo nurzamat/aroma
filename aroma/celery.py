@@ -6,7 +6,7 @@ from django.conf import settings
 
 
 # set the default Django settings module for the 'celery' program.
-from account.tasks import task_calculate_bonus
+# from account.tasks import task_calculate_bonus
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'aroma.settings')
 app = Celery('aroma')
@@ -25,6 +25,6 @@ def debug_task(self):
 @app.task(bind=True)
 def bonus_calculation(self):
     print('Request: {0!r}'.format(self.request))
-    task_calculate_bonus()
+    # task_calculate_bonus()
 
 

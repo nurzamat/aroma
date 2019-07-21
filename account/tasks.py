@@ -3,8 +3,8 @@ from celery.schedules import crontab
 from celery.task import periodic_task
 from celery.utils.log import get_task_logger
 from celery import task
-from account.views import calculate_parent_bonus
 
+from account.views import calculate_bonus
 
 logger = get_task_logger(__name__)
 
@@ -25,4 +25,6 @@ def task_calculate_bonus_test():
 @task()
 def task_calculate_bonus():
     logger.info("calculate bonus starts")
+    calculate_bonus()
+
 
