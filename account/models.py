@@ -34,12 +34,21 @@ class Node(MPTTModel):
     created_date = models.DateTimeField(auto_now=False, blank=True, null=True)
     inviter = models.ForeignKey("Node", null=True, blank=True, related_name='invited_children', on_delete=models.DO_NOTHING)
     parent = TreeForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.CASCADE)
+    is_processed = models.BooleanField(default=0)
 
     class Meta:
         verbose_name_plural = "Nodes"
 
     def __str__(self):
-        return self.name
+        return self.name + get_status(self.status)
+
+
+def get_status(status):
+    if status == 0:
+        return "    (неактивный)"
+    if status == 1:
+        return "    (активный)"
+    return ""
 
 
 class UserProfile(models.Model):

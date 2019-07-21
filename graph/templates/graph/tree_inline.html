@@ -80,9 +80,16 @@
                         <div class="logo">
                             <img style="border-radius: 50%;" src="{% static 'account/img/new_logo.png' %}"/>
                         </div>
-                        <div class="brand">
-                            Id={{ node.pk }} {{ node.name }}
-                        </div>
+                                {% if node.status == 0 %}
+                                    <div class="brand" style="color: red">
+                                         Id={{ node.pk }} {{ node.name }}
+                                    </div>
+                                {% endif %}
+                                {% if node.status == 1 %}
+                                    <div class="brand">
+                                         Id={{ node.pk }} {{ node.name }}
+                                    </div>
+                                {% endif %}
                         </div>
 		            	<div id="displayzone_{{ id }}" class="displayzone"></div>
 		            </a>

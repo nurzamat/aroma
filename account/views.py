@@ -55,12 +55,16 @@ def signup(request):
             return render(request, 'account/signup.html', {'alert': "Регистрируйтесь по реферальной ссылке",
                                                            'packages': packages, 'inviter': inviter})
 
+        inviter_node = get_object_or_404(Node, pk=int(inviter))
+        if inviter_node.status == 0:
+            return render(request, 'account/signup.html', {'alert': "Реферальная ссылка неактивна",
+                                                           'packages': packages, 'inviter': inviter})
+
         username_exists = User.objects.filter(username__iexact=username).exists()
         if username_exists:
             return render(request, 'account/signup.html', {'alert': "Такой логин существует в системе",
                                                            'packages': packages, 'inviter': inviter})
 
-        inviter_node = get_object_or_404(Node, pk=int(inviter))
         is_right = False
         if tree_parent == '':
             return render(request, 'account/signup.html', {'alert': "Укажите parent id",
@@ -140,25 +144,30 @@ def save_registration(address, city, country, username, email, first_name, last_
 
 def calculate_bonus():
     value_settings = get_object_or_404(PropertyValueSettings, name='last_bonus_node')
-    nodes = Node.objects.filter(pk__gt=int(value_settings.value)).order_by('id')
+    # nodes = Node.objects.filter(pk__gt=int(value_settings.value)).order_by('id')
+    nodes = Node.objects.filter(status=1, is_processed=0).order_by('id')
     bonus_settings = BonusSettings.objects.all()
     bonus_types = BonusType.objects.all()
     recommendation_type = bonus_types.get(code=1)
     cycle_type = bonus_types.get(code=3)
     recommendation_bonus_value = bonus_settings.get(bonus_type=recommendation_type, level=1).bonus_value
-    last_node_id = 0
+    # last_node_id = 0
     for node in nodes:
-        last_node_id = node.pk
+        # last_node_id = node.pk
         calculate_recommendation_bonus(node, recommendation_bonus_value, recommendation_type)
         calculate_parent_bonus(cycle_type, node, node)
-    if last_node_id > 0:
-        value_settings.value = last_node_id
-        value_settings.save()
+        node.is_processed = 1
+        node.save()
+    # if last_node_id > 0:
+    #    value_settings.value = last_node_id
+    #    value_settings.save()
 
 
 def calculate_recommendation_bonus(node, recommendation_bonus_value, recommendation_type):
     inviter = node.inviter
-    if inviter:
+    if inviter is None:
+        return
+    if inviter.status == 1:
         Bonus.objects.create(node=inviter, value=recommendation_bonus_value, partner=node, type=recommendation_type.name)
         if inviter.bonus is None:
             inviter.bonus = recommendation_bonus_value
@@ -173,30 +182,30 @@ def calculate_parent_bonus(cycle_type, node, partner):
     parent = node.parent
     if parent is None:
         return
-    if is_right:
-        parent.right_point = parent.right_point + (parent.package.percent * price_som)/100
-    else:
-        parent.left_point = parent.left_point + (parent.package.percent * price_som)/100
-    bonus = 0
-    if parent.right_point > parent.left_point:
-        bonus = parent.left_point
-    elif parent.right_point < parent.left_point:
-        bonus = parent.right_point
-    else:
-        bonus = parent.right_point
-    if bonus > 0:
-        if parent.right_point is None:
-            parent.right_point = 0
-        if parent.left_point is None:
-            parent.left_point = 0
-        if parent.bonus is None:
-            parent.bonus = 0
-        parent.right_point = parent.right_point - bonus
-        parent.left_point = parent.left_point - bonus
-        parent.bonus = parent.bonus + bonus
-        Bonus.objects.create(node=parent, value=bonus, partner=partner,
-                             type=cycle_type.name)
-    parent.save()
+    if parent.status == 1:
+        if is_right:
+            parent.right_point = parent.right_point + (parent.package.percent * price_som)/100
+        else:
+            parent.left_point = parent.left_point + (parent.package.percent * price_som)/100
+        bonus = 0
+        if parent.right_point > parent.left_point:
+            bonus = parent.left_point
+        elif parent.right_point < parent.left_point:
+            bonus = parent.right_point
+        else:
+            bonus = parent.right_point
+        if bonus > 0:
+            if parent.right_point is None:
+                parent.right_point = 0
+            if parent.left_point is None:
+                parent.left_point = 0
+            if parent.bonus is None:
+                parent.bonus = 0
+            parent.right_point = parent.right_point - bonus
+            parent.left_point = parent.left_point - bonus
+            parent.bonus = parent.bonus + bonus
+            Bonus.objects.create(node=parent, value=bonus, partner=partner, type=cycle_type.name)
+        parent.save()
     return calculate_parent_bonus(cycle_type, parent, partner)
 
 
