@@ -9,11 +9,11 @@ from account.views import calculate_parent_bonus
 logger = get_task_logger(__name__)
 
 
-@periodic_task(
-    run_every=(crontab(minute='*/1')),
-    name="task_calculate_bonus",
-    ignore_result=True
-)
+# @periodic_task(
+#    run_every=(crontab(minute='*/1')),
+#    name="task_calculate_bonus",
+#    ignore_result=True
+# )
 def task_calculate_bonus_test():
     """
     Saves latest image from Flickr
@@ -22,7 +22,7 @@ def task_calculate_bonus_test():
     logger.info("Saved image from Flickr")
 
 
-@task()
+# @task()
 def task_calculate_bonus():
     logger.info("calculate bonus starts")
 
