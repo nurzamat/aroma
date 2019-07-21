@@ -91,4 +91,11 @@ class BonusSettings(models.Model):
         return self.bonus_type.name
 
 
+class PropertyValueSettings(models.Model):
+    name = models.CharField(max_length=50)
+    value = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
 

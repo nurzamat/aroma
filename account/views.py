@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.urls import reverse
-from .models import Node, UserProfile, Package, BonusSettings, BonusType, Bonus
+from .models import Node, UserProfile, Package, BonusSettings, BonusType, Bonus, PropertyValueSettings
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -133,37 +133,42 @@ def save_registration(address, city, country, username, email, first_name, last_
     node = Node.objects.create(user=user, name=user.first_name + " " + user.last_name, parent=parent_node,
                                inviter=inviter, is_right=is_right, package=package)
 
-    calculate_bonus(node, inviter)
+    # calculate_bonus(node, inviter)
 
     return node, user, user_profile
 
 
-def calculate_bonus(node, inviter):
-    # bonus
+def calculate_bonus():
+    value_settings = get_object_or_404(PropertyValueSettings, name='last_bonus_node')
+    nodes = Node.objects.filter(pk__gt=int(value_settings.value)).order_by('id')
+    bonus_settings = BonusSettings.objects.all()
+    bonus_types = BonusType.objects.all()
+    recommendation_type = bonus_types.get(code=1)
+    cycle_type = bonus_types.get(code=3)
+    recommendation_bonus_value = bonus_settings.get(bonus_type=recommendation_type, level=1).bonus_value
+    last_node_id = 0
+    for node in nodes:
+        last_node_id = node.pk
+        calculate_recommendation_bonus(node, recommendation_bonus_value, recommendation_type)
+        calculate_parent_bonus(cycle_type, node, node)
+    if last_node_id > 0:
+        value_settings.value = last_node_id
+        value_settings.save()
+
+
+def calculate_recommendation_bonus(node, recommendation_bonus_value, recommendation_type):
+    inviter = node.inviter
     if inviter:
-        bonus_settings = BonusSettings.objects.all()
-        bonus_types = BonusType.objects.all()
-        recommendation_type = bonus_types.get(code=1)
-        # step_type = bonus_types.get(code=2)
-        cycle_type = bonus_types.get(code=3)
-
-        # bonus for recommendation
-        recommendation_bonus_value = bonus_settings.get(bonus_type=recommendation_type, level=1).bonus_value
-        Bonus.objects.create(node=inviter, value=recommendation_bonus_value, partner=node,
-                             type=recommendation_type.name)
-
+        Bonus.objects.create(node=inviter, value=recommendation_bonus_value, partner=node, type=recommendation_type.name)
         if inviter.bonus is None:
             inviter.bonus = recommendation_bonus_value
         else:
             inviter.bonus = inviter.bonus + recommendation_bonus_value
         inviter.save()
 
-        # bonus for registration
-        price_som = node.package.price_som
-        calculate_parent_bonus(cycle_type, node, price_som)
 
-
-def calculate_parent_bonus(cycle_type, node, price_som):
+def calculate_parent_bonus(cycle_type, node, partner):
+    price_som = node.package.price_som
     is_right = node.is_right
     parent = node.parent
     if parent is None:
@@ -180,13 +185,19 @@ def calculate_parent_bonus(cycle_type, node, price_som):
     else:
         bonus = parent.right_point
     if bonus > 0:
+        if parent.right_point is None:
+            parent.right_point = 0
+        if parent.left_point is None:
+            parent.left_point = 0
+        if parent.bonus is None:
+            parent.bonus = 0
         parent.right_point = parent.right_point - bonus
         parent.left_point = parent.left_point - bonus
         parent.bonus = parent.bonus + bonus
-        Bonus.objects.create(node=parent, value=bonus, partner=node,
+        Bonus.objects.create(node=parent, value=bonus, partner=partner,
                              type=cycle_type.name)
     parent.save()
-    return calculate_parent_bonus(cycle_type, parent, price_som)
+    return calculate_parent_bonus(cycle_type, parent, partner)
 
 
 def validate_username_ajax(request):
