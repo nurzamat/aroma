@@ -12,7 +12,9 @@ class Package(models.Model):
     name = models.CharField(max_length=50)
     percent = models.IntegerField(default=0)
     point = models.IntegerField(default=0)
+    recommendation_bonus_usd = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     price_som = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    price_usd = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -80,6 +82,7 @@ class Bonus(models.Model):
     value = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     partner = models.ForeignKey(Node, on_delete=models.CASCADE, related_name="bonus_partner", null=True)
     type = models.CharField(max_length=60, null=True, blank=True)
+    currency = models.CharField(max_length=20, null=True, blank=True)
     created_date = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     def __str__(self):

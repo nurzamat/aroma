@@ -143,19 +143,20 @@ def save_registration(address, city, country, username, email, first_name, last_
 
 
 def calculate_bonus():
-    value_settings = get_object_or_404(PropertyValueSettings, name='last_bonus_node')
+    value_settings = get_object_or_404(PropertyValueSettings, name='pv_som')
+    pv_value_som = int(value_settings.value)
     # nodes = Node.objects.filter(pk__gt=int(value_settings.value)).order_by('id')
     nodes = Node.objects.filter(status=1, is_processed=0).order_by('id')
     bonus_settings = BonusSettings.objects.all()
     bonus_types = BonusType.objects.all()
     recommendation_type = bonus_types.get(code=1)
     cycle_type = bonus_types.get(code=3)
-    recommendation_bonus_value = bonus_settings.get(bonus_type=recommendation_type, level=1).bonus_value
+    cycle_bonus_value = bonus_settings.get(bonus_type=cycle_type, level=1).bonus_value
     # last_node_id = 0
     for node in nodes:
         # last_node_id = node.pk
-        calculate_recommendation_bonus(node, recommendation_bonus_value, recommendation_type)
-        calculate_parent_bonus(cycle_type, node, node)
+        calculate_recommendation_bonus(node, recommendation_type)
+        calculate_parent_bonus(cycle_type, node, node, cycle_bonus_value, pv_value_som)
         node.is_processed = 1
         node.save()
     # if last_node_id > 0:
@@ -163,12 +164,13 @@ def calculate_bonus():
     #    value_settings.save()
 
 
-def calculate_recommendation_bonus(node, recommendation_bonus_value, recommendation_type):
+def calculate_recommendation_bonus(node, recommendation_type):
     inviter = node.inviter
+    recommendation_bonus_value = node.package.recommendation_bonus_usd
     if inviter is None:
         return
     if inviter.status == 1:
-        Bonus.objects.create(node=inviter, value=recommendation_bonus_value, partner=node, type=recommendation_type.name)
+        Bonus.objects.create(node=inviter, value=recommendation_bonus_value, partner=node, type=recommendation_type.name, currency='usd')
         if inviter.bonus is None:
             inviter.bonus = recommendation_bonus_value
         else:
@@ -176,7 +178,7 @@ def calculate_recommendation_bonus(node, recommendation_bonus_value, recommendat
         inviter.save()
 
 
-def calculate_parent_bonus(cycle_type, node, partner):
+def calculate_parent_bonus(cycle_type, node, partner, cycle_bonus_value, pv_value_som):
     price_som = node.package.price_som
     is_right = node.is_right
     parent = node.parent
@@ -184,29 +186,30 @@ def calculate_parent_bonus(cycle_type, node, partner):
         return
     if parent.status == 1:
         if is_right:
-            parent.right_point = parent.right_point + (parent.package.percent * price_som)/100
+            parent.right_point = parent.right_point + (parent.package.percent * price_som)/(100 * pv_value_som)
         else:
-            parent.left_point = parent.left_point + (parent.package.percent * price_som)/100
-        bonus = 0
+            parent.left_point = parent.left_point + (parent.package.percent * price_som)/(100 * pv_value_som)
+        pv_bonus = 0
         if parent.right_point > parent.left_point:
-            bonus = parent.left_point
+            pv_bonus = parent.left_point
         elif parent.right_point < parent.left_point:
-            bonus = parent.right_point
+            pv_bonus = parent.right_point
         else:
-            bonus = parent.right_point
-        if bonus > 0:
+            pv_bonus = parent.right_point
+        if pv_bonus > 0:
             if parent.right_point is None:
                 parent.right_point = 0
             if parent.left_point is None:
                 parent.left_point = 0
             if parent.bonus is None:
                 parent.bonus = 0
-            parent.right_point = parent.right_point - bonus
-            parent.left_point = parent.left_point - bonus
+            parent.right_point = parent.right_point - pv_bonus
+            parent.left_point = parent.left_point - pv_bonus
+            bonus = pv_bonus * cycle_bonus_value
             parent.bonus = parent.bonus + bonus
-            Bonus.objects.create(node=parent, value=bonus, partner=partner, type=cycle_type.name)
+            Bonus.objects.create(node=parent, value=bonus, partner=partner, type=cycle_type.name, currency='usd')
         parent.save()
-    return calculate_parent_bonus(cycle_type, parent, partner)
+    return calculate_parent_bonus(cycle_type, parent, partner, cycle_bonus_value, pv_value_som)
 
 
 def validate_username_ajax(request):
