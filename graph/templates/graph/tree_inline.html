@@ -67,6 +67,9 @@
             <div class="container-fluid">
                 <a href="{% url 'account:structure' %}">Показать списком</a>
                <div class="text-center">
+                   <div class="row">
+                   PV: {{ left_pv }} | {{ right_pv }}
+               </div>
                <div class="row">
                    Левая: {{ left_count }} | Правая: {{ right_count }} | Общее количество: {{ total_count }}
                </div>

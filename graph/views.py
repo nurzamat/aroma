@@ -55,6 +55,8 @@ class ModelGraphView(TemplateView):
         context['total_count'] = left_count + right_count
         context['left_count'] = left_count
         context['right_count'] = right_count
+        context['left_pv'] = root_node.left_point
+        context['right_pv'] = root_node.right_point
         return context
 
 
