@@ -34,7 +34,7 @@ class ModelGraphView(TemplateView):
         # model = get_model_from_path(self.kwargs['modpath'])
         root_node_pk = self.kwargs['pk']
         root_node = Node.objects.get(pk=root_node_pk)
-        nodes = root_node.get_descendants(include_self=True)[:50]
+        nodes = root_node.get_descendants(include_self=True)[:20]
 
         left_count = 0
         right_count = 0
