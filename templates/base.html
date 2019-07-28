@@ -34,7 +34,9 @@
 {% endblock %}
 
 <body>
-
+                {% if user.is_authenticated %}
+                     <input type="hidden" id="nodeId" name="nodeId" value="{{ user.node.id }}">
+                {% endif %}
 <div class="wrapper">
 {% block sidebar %}
 	<div class="sidebar" data-background-color="white" data-active-color="danger">
